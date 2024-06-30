@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Survey Application</title>
+    <!-- Add any CSS styling here -->
+    <style>
+        /* Example CSS for styling */
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+        .survey-container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        .question-container {
+            margin-bottom: 20px;
+        }
+        .survey-btn {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="survey-container">
+        <h1>My Comprehensive Survey</h1>
+        <div id="question-container">
+            <!-- Questions will be dynamically added here -->
+        </div>
+        <div id="progress">
+            <!-- Survey progress will be displayed here -->
+        </div>
+        <button id="submit-btn" class="survey-btn" style="display: none;">Submit</button>
+    </div>
+
+    <!-- Include your main.js script -->
+    <script type="module" src="controller.js"></script>
+</body>
+</html>
