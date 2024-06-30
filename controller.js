@@ -1,4 +1,4 @@
-import survey from './experiments/data_labeler.js'; // Importing the initialized survey instance
+import survey from './experiments/sandbox.js'; // Importing the initialized survey instance
 import { finishSurvey } from './utils/utils.js'; // Import the finishSurvey function from utils.js
 
 // Function to display the current page of the survey
@@ -38,7 +38,29 @@ function collectData() {
         }
     });
 
+    // Merge grid data if any
+    const gridData = getGridData();
+    Object.keys(gridData).forEach(key => {
+        data[key] = gridData[key];
+    });
+
     return data;
+}
+
+// Function to collect data from grid elements
+function getGridData() {
+    const gridData = {};
+    document.querySelectorAll('.question.grid').forEach(gridElement => {
+        const gridInputs = gridElement.querySelectorAll('input[type="radio"]:checked');
+        gridInputs.forEach(input => {
+            const [gridId, row] = input.name.split('_');
+            if (!gridData[gridId]) {
+                gridData[gridId] = {};
+            }
+            gridData[gridId][row] = input.value;
+        });
+    });
+    return gridData;
 }
 
 // Function to submit data
