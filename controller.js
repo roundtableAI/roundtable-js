@@ -36,32 +36,6 @@ function collectData() {
 }
 
 
-
-
-function getGridData() {
-    const gridData = {};
-    document.querySelectorAll('.question.grid').forEach(gridElement => {
-        const gridId = gridElement.id;
-        if (!gridData[gridId]) {
-            gridData[gridId] = [];
-        }
-        const rows = [];
-        gridElement.querySelectorAll('tr').forEach((rowElement, rowIndex) => {
-            if (rowIndex === 0) return; // Skip header row
-            const rowName = rowElement.querySelector('td').textContent.trim();
-            const selectedInput = rowElement.querySelector('input[type="radio"]:checked');
-            if (selectedInput) {
-                const columnValue = selectedInput.value;
-                rows.push({ row: rowName, column: columnValue });
-            }
-        });
-        gridData[gridId] = rows;
-    });
-    return gridData;
-}
-
-
-
 // Function to submit data
 function submitData() {
     const data = collectData();
