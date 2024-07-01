@@ -64,17 +64,18 @@ initialPages.forEach(page => survey.addPage(page));
 // Function to add follow-up questions based on "Everyday" selections
 function addFollowUpQuestions(data) {
     const followUpPages = [];
-    const everydaySelections = data.q1b ? data.q1b.filter(item => item.column === 'Everyday') : [];
-    everydaySelections.forEach(selection => {
+    const everydaySelections = data.q1b ? data.q1b.filter(item => item.column === 'Everyday').map(item => item.row) : [];
+    if (everydaySelections.length > 0) {
         const followUpQuestion = {
-            id: `q_followup_${selection.row}`,
-            text: `You said you use ${selection.row} everyday. How many times a day?`,
-            options: ['1 time a day', '2 times a day', '3 times a day', '4 times a day', '5 times a day']
+            id: 'q1c',
+            text: 'How many times a day do you use these beverages?',
+            rows: everydaySelections,
+            columns: ['1 time a day', '2 times a day', '3 times a day', '4 times a day', '5 times a day']
         };
-        const page = new Page(`page_followup_${selection.row}`, () => true);
-        page.addElement(new SingleChoice(followUpQuestion.id, followUpQuestion.text, followUpQuestion.options));
+        const page = new Page('page_followup_q1c', () => true);
+        page.addElement(new Grid(followUpQuestion.id, followUpQuestion.text, followUpQuestion.rows, followUpQuestion.columns, true));
         followUpPages.push(page);
-    });
+    }
 
     return followUpPages;
 }
@@ -82,7 +83,6 @@ function addFollowUpQuestions(data) {
 // Override submitData to handle logic after data is received
 const originalSubmitData = survey.submitData.bind(survey);
 survey.submitData = (data) => {
-
     // Check if the current page contains q1b and add follow-up questions immediately after it
     const currentPage = survey.pages[survey.currentPageIndex];
     if (currentPage.elements.some(element => element.id === 'q1b')) {
