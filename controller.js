@@ -19,46 +19,38 @@ function displayPage() {
     }
 }
 
+// Function to collect data from form elements
 function collectData() {
     const data = {};
     
     // Assuming `survey` is your survey instance
-    survey.pages.forEach(page => {
-        page.elements.forEach(element => {
-            const elementData = element.getData();
-            if (elementData !== null) {
-                data[element.id] = elementData;
-            }
-        });
+    survey.pages[survey.currentPageIndex].elements.forEach(element => {
+        const elementData = element.getData();
+        if (elementData !== null) {
+            data[element.id] = elementData;
+        }
     });
     
     return data;
 }
 
-
 // Function to submit data
 function submitData() {
     const data = collectData();
 
-    console.log('Collected Data:', data); // Log collected data to verify
-
-    const currentPageIndex = survey.currentPageIndex;
-    const totalPages = survey.pages.length;
     const currentPage = survey.submitData(data);
 
     // Save data to localStorage or any other storage mechanism
     saveDataToLocalStorage(survey.data); // Store the survey instance's data
 
-    // Log data to console
-    console.log('Stored Data:', survey.data);
+    console.log(survey.currentPageIndex)
+    console.log(survey.isComplete())
 
     // Check if the current page is the last page
-    if (currentPageIndex === totalPages - 1) {
+    if (survey.isComplete()) {
         finishSurvey(survey); // Finish the survey if on the last page
-    } else if (currentPage) {
-        displayPage();
     } else {
-        alert('Please answer all questions before proceeding.');
+        displayPage();
     }
 }
 

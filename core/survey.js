@@ -15,6 +15,10 @@ class Survey {
         this.pages.push(page);
     }
 
+    insertPagesAtIndex(pages, index) {
+        this.pages.splice(index, 0, ...pages);
+    }
+
     start() {
         this.currentPageIndex = 0;
         return this.getCurrentPage();
@@ -29,9 +33,7 @@ class Survey {
     }
 
     nextPage() {
-        if (this.currentPageIndex < this.pages.length - 1) {
-            this.currentPageIndex++;
-        }
+        this.currentPageIndex++;
     }
 
     previousPage() {
@@ -112,8 +114,38 @@ class Survey {
         this.logicRules.push({ condition, action });
     }
 
+    render() {
+        const currentPage = this.getCurrentPage();
+        if (!currentPage) {
+            console.warn('Survey is complete or no current page available.');
+            return;
+        }
+
+        const questionContainer = document.getElementById('question-container');
+        if (questionContainer) {
+            questionContainer.innerHTML = currentPage.render(this.data);
+
+            // Update progress or other UI elements as needed
+            const progress = this.getProgress();
+            const progressElement = document.getElementById('progress');
+            if (progressElement) {
+                progressElement.textContent = `Page ${progress.current} of ${progress.total}`;
+            }
+        } else {
+            console.error('Question container element not found.');
+        }
+    }
+
     endSurvey() {
         this.currentPageIndex = this.pages.length;
+        const questionContainer = document.getElementById('question-container');
+        if (questionContainer) {
+            questionContainer.innerHTML = "<p>Thank you for completing the survey!</p>";
+        }
+        const progressElement = document.getElementById('progress');
+        if (progressElement) {
+            progressElement.textContent = "Survey complete.";
+        }
     }
 }
 

@@ -3,9 +3,10 @@ import Survey from '../core/survey.js';
 import Page from '../core/page.js';
 import MultipleChoice from '../question_types/multipleChoice.js';
 import Grid from '../question_types/grid.js';
+import SingleChoice from '../question_types/singleChoice.js';
 
 // Create and initialize a new survey
-const survey = new Survey('beverageSurvey', 'Comprehensive Beverage Consumption Survey');
+const survey = new Survey('sandbox', 'Sandbox Survey');
 
 // Constructs and populates pages with appropriate survey questions and logic
 function constructSurveyPages() {
@@ -60,11 +61,39 @@ function constructSurveyPages() {
 const initialPages = constructSurveyPages();
 initialPages.forEach(page => survey.addPage(page));
 
+// Function to add follow-up questions based on "Everyday" selections
+function addFollowUpQuestions(data) {
+    const followUpPages = [];
+    const everydaySelections = data.q1b ? data.q1b.filter(item => item.column === 'Everyday') : [];
+    everydaySelections.forEach(selection => {
+        const followUpQuestion = {
+            id: `q_followup_${selection.row}`,
+            text: `You said you use ${selection.row} everyday. How many times a day?`,
+            options: ['1 time a day', '2 times a day', '3 times a day', '4 times a day', '5 times a day']
+        };
+        const page = new Page(`page_followup_${selection.row}`, () => true);
+        page.addElement(new SingleChoice(followUpQuestion.id, followUpQuestion.text, followUpQuestion.options));
+        followUpPages.push(page);
+    });
+
+    return followUpPages;
+}
+
 // Override submitData to handle logic after data is received
 const originalSubmitData = survey.submitData.bind(survey);
 survey.submitData = (data) => {
-    console.log(data);
+
+    // Check if the current page contains q1b and add follow-up questions immediately after it
+    const currentPage = survey.pages[survey.currentPageIndex];
+    if (currentPage.elements.some(element => element.id === 'q1b')) {
+        const followUpPages = addFollowUpQuestions(data);
+        if (followUpPages.length > 0) {
+            followUpPages.forEach(page => survey.insertPagesAtIndex([page], survey.currentPageIndex + 1));
+        }
+    }
+
     const updatedPage = originalSubmitData(data);
+
     return updatedPage;
 };
 

@@ -13,9 +13,18 @@ export function checkNoneOfTheAbove(data) {
 
 // Function to finish survey
 export function finishSurvey(survey) {
-    document.getElementById('question-container').innerHTML = '<h2>Survey Complete!</h2>';
-    document.getElementById('submit-btn').style.display = 'none';
-    document.getElementById('progress').style.display = 'none';
+    const questionContainer = document.getElementById('question-container');
+    if (questionContainer) {
+        questionContainer.innerHTML = '<h2>Survey Complete!</h2>';
+    }
+    const submitButton = document.getElementById('submit-btn');
+    if (submitButton) {
+        submitButton.style.display = 'none';
+    }
+    const progressElement = document.getElementById('progress');
+    if (progressElement) {
+        progressElement.style.display = 'none';
+    }
     console.log('Survey has been completed.');
     survey.endSurvey();
 }
