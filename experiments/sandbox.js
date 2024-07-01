@@ -3,7 +3,6 @@ import Survey from '../core/survey.js';
 import Page from '../core/page.js';
 import MultipleChoice from '../question_types/multipleChoice.js';
 import Grid from '../question_types/grid.js';
-import SingleChoice from '../question_types/singleChoice.js';
 
 // Create and initialize a new survey
 const survey = new Survey('sandbox', 'Sandbox Survey');
@@ -61,10 +60,40 @@ function constructSurveyPages() {
 const initialPages = constructSurveyPages();
 initialPages.forEach(page => survey.addPage(page));
 
-// Function to add follow-up questions based on "Everyday" selections
-function addFollowUpQuestions(data) {
+// Function to add follow-up questions based on `q1a`
+function addFollowUpQuestionsBasedOnQ1a(data) {
+    const followUpPages = [];
+
+    if (data.q1a && data.q1a.includes('In the morning')) {
+        const morningFollowUp = {
+            id: 'q2a_multi',
+            text: 'You said you use beverages in the morning. In which of the following ways do you use it in the morning?',
+            options: ['With breakfast', 'As a morning pick-me-up', 'As a part of a morning workout', 'Other']
+        };
+        const page = new Page('page_followup_q2a_multi', () => true);
+        page.addElement(new MultipleChoice(morningFollowUp.id, morningFollowUp.text, morningFollowUp.options));
+        followUpPages.push(page);
+    }
+
+    if (data.q1a && data.q1a.includes('With meals')) {
+        const mealsFollowUp = {
+            id: 'q3a_multi',
+            text: 'You said you use beverages with meals. In which of the following ways do you use it with meals?',
+            options: ['With lunch', 'With dinner', 'With snacks', 'Other']
+        };
+        const page = new Page('page_followup_q3a_multi', () => true);
+        page.addElement(new MultipleChoice(mealsFollowUp.id, mealsFollowUp.text, mealsFollowUp.options));
+        followUpPages.push(page);
+    }
+
+    return followUpPages;
+}
+
+// Function to add follow-up questions based on `q1b`
+function addFollowUpQuestionsBasedOnQ1b(data) {
     const followUpPages = [];
     const everydaySelections = data.q1b ? data.q1b.filter(item => item.column === 'Everyday').map(item => item.row) : [];
+
     if (everydaySelections.length > 0) {
         const followUpQuestion = {
             id: 'q1c',
@@ -80,15 +109,29 @@ function addFollowUpQuestions(data) {
     return followUpPages;
 }
 
+// Track if follow-up pages have been added
+let followUpPagesBasedOnQ1aAdded = false;
+let followUpPagesBasedOnQ1bAdded = false;
+
 // Override submitData to handle logic after data is received
 const originalSubmitData = survey.submitData.bind(survey);
 survey.submitData = (data) => {
-    // Check if the current page contains q1b and add follow-up questions immediately after it
-    const currentPage = survey.pages[survey.currentPageIndex];
-    if (currentPage.elements.some(element => element.id === 'q1b')) {
-        const followUpPages = addFollowUpQuestions(data);
+    // Add follow-up questions based on `q1a` at the end of the survey if not already added
+    if (!followUpPagesBasedOnQ1aAdded) {
+        const followUpPages = addFollowUpQuestionsBasedOnQ1a(data);
         if (followUpPages.length > 0) {
-            followUpPages.forEach(page => survey.insertPagesAtIndex([page], survey.currentPageIndex + 1));
+            followUpPages.forEach(page => survey.addPage(page));
+            followUpPagesBasedOnQ1aAdded = true; // Mark follow-up pages as added
+        }
+    }
+
+    // Check if the current page contains `q1b` and add follow-up questions based on `q1b` immediately after it
+    const currentPage = survey.pages[survey.currentPageIndex];
+    if (currentPage.elements.some(element => element.id === 'q1b') && !followUpPagesBasedOnQ1bAdded) {
+        const followUpPages = addFollowUpQuestionsBasedOnQ1b(data);
+        if (followUpPages.length > 0) {
+            followUpPages.forEach(page => survey.insertPagesAtIndex([page], survey.currentPageIndex+1));
+            followUpPagesBasedOnQ1bAdded = true; // Mark follow-up pages as added
         }
     }
 
