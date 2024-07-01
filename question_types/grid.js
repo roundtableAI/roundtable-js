@@ -19,7 +19,7 @@ class Grid extends Element {
         }
 
         return `
-            <div class="question grid">
+            <div class="question grid" id="${this.id}">
                 <p>${renderedText}</p>
                 <table>
                     <thead>
@@ -48,14 +48,16 @@ class Grid extends Element {
     getData() {
         const data = {};
         document.querySelectorAll(`input[name^="${this.id}_"]:checked`).forEach(input => {
-            const [prefix, row] = input.name.split('_');
+            const [prefix, ...rowParts] = input.name.split('_');
+            const row = rowParts.join('_');  // Rejoin row parts to handle any underscores in the row name
             if (!data[prefix]) {
-                data[prefix] = {};
+                data[prefix] = [];
             }
-            data[prefix][row] = input.value;
+            data[prefix].push({ row, column: input.value });
         });
-        return data;
+        return data[this.id];
     }
+    
 
     clone() {
         return new Grid(this.id, this.text, this.rows, this.columns, this.isDynamic);

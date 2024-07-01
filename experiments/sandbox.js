@@ -4,9 +4,6 @@ import Page from '../core/page.js';
 import MultipleChoice from '../question_types/multipleChoice.js';
 import Grid from '../question_types/grid.js';
 
-// Utility function to normalize keys
-const normalizeKey = (str) => str.replace(/\s+/g, '_').toLowerCase();
-
 // Create and initialize a new survey
 const survey = new Survey('beverageSurvey', 'Comprehensive Beverage Consumption Survey');
 
@@ -41,32 +38,6 @@ function constructSurveyPages() {
                 'Once a month',
                 'Less Often'
             ]
-        },
-        {
-            id: 'q1c',
-            text: 'How many times a day do you use beverages for the following occasions?',
-            grid: true,
-            rows: (data) => {
-                if (!Array.isArray(data['q1a']) || !data.q1b) return [];
-                const everydayRows = [];
-                data['q1a'].forEach((occasion) => {
-                    const key = normalizeKey(occasion);
-                    if (data.q1b[key] && data.q1b[key] === 'Everyday') {
-                        everydayRows.push(occasion);
-                    }
-                });
-                return everydayRows;
-            },
-            columns: [
-                '1 time a day',
-                '2 times a day',
-                '3 times a day',
-                '4 times a day',
-                '5 times a day',
-                '6 times a day',
-                '7 times a day',
-                '8 times a day'
-            ]
         }
     ];
 
@@ -92,16 +63,8 @@ initialPages.forEach(page => survey.addPage(page));
 // Override submitData to handle logic after data is received
 const originalSubmitData = survey.submitData.bind(survey);
 survey.submitData = (data) => {
-    // Normalize keys for q1b
-    const normalizedData = { ...data, q1b: {} };
-    if (data.q1b) {
-        for (const key in data.q1b) {
-            const normalizedKey = normalizeKey(key);
-            normalizedData.q1b[normalizedKey] = data.q1b[key];
-        }
-    }
-    console.log(normalizedData);
-    const updatedPage = originalSubmitData(normalizedData);
+    console.log(data);
+    const updatedPage = originalSubmitData(data);
     return updatedPage;
 };
 

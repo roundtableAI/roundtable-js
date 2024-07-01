@@ -19,49 +19,48 @@ function displayPage() {
     }
 }
 
-// Function to collect data from form elements
 function collectData() {
     const data = {};
-    const currentPageElements = document.querySelectorAll(`#question-container input, #question-container select, #question-container textarea`);
-
-    currentPageElements.forEach(element => {
-        const name = element.name;
-        if (element.type === 'radio' || element.type === 'checkbox') {
-            if (element.checked) {
-                if (!data[name]) {
-                    data[name] = [];
-                }
-                data[name].push(element.value);
+    
+    // Assuming `survey` is your survey instance
+    survey.pages.forEach(page => {
+        page.elements.forEach(element => {
+            const elementData = element.getData();
+            if (elementData !== null) {
+                data[element.id] = elementData;
             }
-        } else {
-            data[name] = element.value;
-        }
+        });
     });
-
-    // Merge grid data if any
-    const gridData = getGridData();
-    Object.keys(gridData).forEach(key => {
-        data[key] = gridData[key];
-    });
-
+    
     return data;
 }
 
-// Function to collect data from grid elements
+
+
+
 function getGridData() {
     const gridData = {};
     document.querySelectorAll('.question.grid').forEach(gridElement => {
-        const gridInputs = gridElement.querySelectorAll('input[type="radio"]:checked');
-        gridInputs.forEach(input => {
-            const [gridId, row] = input.name.split('_');
-            if (!gridData[gridId]) {
-                gridData[gridId] = {};
+        const gridId = gridElement.id;
+        if (!gridData[gridId]) {
+            gridData[gridId] = [];
+        }
+        const rows = [];
+        gridElement.querySelectorAll('tr').forEach((rowElement, rowIndex) => {
+            if (rowIndex === 0) return; // Skip header row
+            const rowName = rowElement.querySelector('td').textContent.trim();
+            const selectedInput = rowElement.querySelector('input[type="radio"]:checked');
+            if (selectedInput) {
+                const columnValue = selectedInput.value;
+                rows.push({ row: rowName, column: columnValue });
             }
-            gridData[gridId][row] = input.value;
         });
+        gridData[gridId] = rows;
     });
     return gridData;
 }
+
+
 
 // Function to submit data
 function submitData() {

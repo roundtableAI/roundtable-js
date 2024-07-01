@@ -37,7 +37,7 @@ class MultipleChoice extends Element {
 
     getData() {
         return Array.from(document.querySelectorAll(`input[name="${this.id}"]:checked`)).map(input => input.value);
-    }
+    }    
 
     clone() {
         return new MultipleChoice(this.id, this.text, this.optionGenerator, typeof this.optionGenerator === 'function', this.htmlContent);
