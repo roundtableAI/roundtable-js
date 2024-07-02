@@ -9,9 +9,9 @@ We believe that well-crafted surveys lead to better data, and better data leads 
 <br/>
 
 <p align="center">
-   <a href="https://github.com/roundtableAI/pulse-library/stargazers"><img src="https://img.shields.io/github/stars/roundtableAI/pulse-library" alt="Github Stars"></a>
+   <a href="https://github.com/roundtableAI/roundtable-js/stargazers"><img src="https://img.shields.io/github/stars/roundtableAI/roundtable-js" alt="Github Stars"></a>
    <a href="https://news.ycombinator.com/item?id=36865625"><img src="https://img.shields.io/badge/Hacker%20News-121-%23FF6600" alt="Hacker News"></a>
-   <a href="https://github.com/roundtableAI/pulse-library/LICENSE"><img src="https://img.shields.io/badge/license-AGPLv3-purple" alt="License"></a>
+   <a href="https://github.com/roundtableAI/roundtable-js/LICENSE"><img src="https://img.shields.io/badge/license-AGPLv3-purple" alt="License"></a>
    <a href="https://twitter.com/roundtableDOTai"><img src="https://img.shields.io/twitter/follow/roundtableDOTai?style=flat"></a>
    <a href="https://www.ycombinator.com"><img src="https://img.shields.io/badge/Backed%20by-Y%20Combinator-%23f26625"></a>
 </p>
@@ -92,9 +92,9 @@ export default beverageSurvey;
 
 ## 🛠️ Development / Open-Source Community
 <p align="center">
-   <a href="https://codecov.io/gh/roundtableAI/pulse-library"><img src="https://codecov.io/gh/roundtableAI/pulse-library/branch/main/graph/badge.svg" alt="Coverage"></a>
-   <a href="https://github.com/roundtableAI/pulse-library/issues"><img src="https://img.shields.io/github/issues/roundtableAI/pulse-library" alt="Issues"></a>
-   <a href="https://github.com/roundtableAI/pulse-library/pulls"><img src="https://img.shields.io/github/issues-pr/roundtableAI/pulse-library" alt="Pull Requests"></a>
+   <a href="https://codecov.io/gh/roundtableAI/roundtable-js"><img src="https://codecov.io/gh/roundtableAI/roundtable-js/branch/main/graph/badge.svg" alt="Coverage"></a>
+   <a href="https://github.com/roundtableAI/roundtable-js/issues"><img src="https://img.shields.io/github/issues/roundtableAI/roundtable-js" alt="Issues"></a>
+   <a href="https://github.com/roundtableAI/roundtable-js/pulls"><img src="https://img.shields.io/github/issues-pr/roundtableAI/roundtable-js" alt="Pull Requests"></a>
 </p>
 
 We love contributions! Please see our [Contributing Guide](CONTRIBUTING.md) TODO
