@@ -34,61 +34,48 @@ Whether you're conducting market research, gathering academic data, or measuring
 
 
 
-## 🚀 Quick Start
+## 🚀 Quick Start (TODO)
 
 ```bash
-npm install roundtable
+npm install roundtable-js
 ```
 
-TODO
-
-## 📚 Documentation
-
-Visit our [full documentation](https://docs.roundtable.ai) for TODO
-
-## 🛠️ Examples
+## 🛠️ Examples (TODO)
 
 
 Create a dynamic survey with branching logic:
 
-```javascript
-import Survey from './core/survey.js';
-import Page from './core/page.js';
-import MultipleChoice from './question_types/multipleChoice.js';
-import Grid from './question_types/grid.js';
+```html
+<!DOCTYPE html>
+<html>
+<head>
+  <title>RoundtableJS Example</title>
+  <script src="https://unpkg.com/roundtable-js@0.1.1/dist/roundtable.min.js"></script>
+</head>
+<body>
+  <h1>RoundtableJS Demo</h1>
+  <div id="survey-container"></div>
 
-// Create a new survey
-const beverageSurvey = new Survey('beverage_usage', 'Beverage Usage Survey');
+  <script>
+    // Use the RoundtableJS library
+    // Create a new survey
+    const survey = new RoundtableJS.Survey('my-survey', 'My Survey');
 
-// Add initial questions
-const page1 = new Page('page1', () => true);
-page1.addElement(new MultipleChoice('q1a', 'On what occasions do you regularly use beverages?', [
-    'In the morning', 'With meals', 'As a snack', 'With desserts', 'As a refreshing drink', 'As a health supplement'
-]));
-beverageSurvey.addPage(page1);
+    // Add a new page
+    const page = new RoundtableJS.Page('page1', 'Page 1');
+    page.addElement(new RoundtableJS.MultipleChoice('q1', 'What is your favorite animal?', ['Cat', 'Dog', 'Hamster']));
+    survey.addPage(page);
 
-const page2 = new Page('page2', data => data.q1a && data.q1a.length > 0);
-page2.addElement(new Grid('q1b', 'How often do you use beverages for the following purposes?', 
-    data => data.q1a || [],
-    ['Everyday', 'Four or five times a week', 'Two or three times a week', 'Once a week', 'Three times a month', 'Twice a month', 'Once a month', 'Less Often']
-));
-beverageSurvey.addPage(page2);
-
-// Add dynamic follow-up questions
-beverageSurvey.submitData = (data) => {
-    if (data.q1a && data.q1a.includes('In the morning')) {
-        const morningFollowUp = new Page('morning_followup', () => true);
-        morningFollowUp.addElement(new MultipleChoice('q2a_multi', 'How do you use beverages in the morning?', 
-            ['With breakfast', 'As a morning pick-me-up', 'As a part of a morning workout', 'Other']
-        ));
-        beverageSurvey.addPage(morningFollowUp);
-    }
-
-    return Survey.prototype.submitData.call(beverageSurvey, data);
-};
-
-export default beverageSurvey;
+    // Render the survey
+    survey.render();
+  </script>
+</body>
+</html>
 ```
+
+## 📚 Documentation
+
+Read our [full documentation](https://docs.roundtable.ai).
 
 ## 🛠️ Development / Open-Source Community
 <p align="center">
@@ -101,7 +88,7 @@ We love contributions! Please see our [Contributing Guide](CONTRIBUTING.md) TODO
 
 ## 📜 License
 
-SurveyForge is open source software [licensed](LICENSE).
+Roundtable is open source software [licensed](LICENSE).
 
 ## 🎉 Community
 
