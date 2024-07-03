@@ -1,5 +1,5 @@
-import Page from "./page.js";
-import Element from "./element.js";
+import Page from "./page.mjs";
+import Element from "./element.mjs";
 
 class Survey {
     constructor(id, title) {
