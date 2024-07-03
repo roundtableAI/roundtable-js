@@ -1,7 +1,7 @@
 // Import core survey components
 import Survey from '../core/survey.js';
 import Page from '../core/page.js';
-import MultipleChoice from '../question_types/multipleChoice.js';
+import MultipleSelect from '../question_types/multipleSelect.js';
 import SingleChoice from '../question_types/singleChoice.js';
 import Grid from '../question_types/grid.js';
 
@@ -95,7 +95,7 @@ function constructSurveyPages() {
         const page = new Page(`page${index + 1}`, data => 
             index === 0 || data[surveyQuestions[index - 1].id].length > 0
         );
-        page.addElement(new MultipleChoice(question.id, question.text, question.options, question.dynamic));
+        page.addElement(new MultipleSelect(question.id, question.text, question.options, question.dynamic));
         surveyPages.push(page);
     });
 
@@ -141,7 +141,7 @@ function handleNoneOfTheAbove(id) {
 // Apply the "None of the above" logic to all multiple choice questions
 initialPages.forEach(page => {
     page.elements.forEach(element => {
-        if (element.type === 'multipleChoice') {
+        if (element.type === 'multipleSelect') {
             handleNoneOfTheAbove(element.id);
         }
     });
@@ -313,7 +313,7 @@ const insertDetailedQuestions = (data, survey) => {
             } else if (question.type === 'number') {
                 page.addElement(new Numeric(question.id, question.text, question.detailText));
             } else {
-                page.addElement(new MultipleChoice(question.id, question.text, question.options));
+                page.addElement(new MultipleSelect(question.id, question.text, question.options));
             }
             survey.pages.push(page);
         });

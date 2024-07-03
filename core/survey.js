@@ -65,7 +65,7 @@ class Survey {
 
         return this.getCurrentPage();
     }
-
+    
     applyLogicRules() {
         for (const rule of this.logicRules) {
             if (rule.condition(this.data, this.currentPageIndex, this.pages)) {

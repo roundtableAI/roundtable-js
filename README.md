@@ -34,13 +34,13 @@ Whether you're conducting market research, gathering academic data, or measuring
 
 
 
-## 🚀 Quick Start (TODO)
+## 🚀 Quick Start
 
 ```bash
 npm install roundtable-js
 ```
 
-## 🛠️ Examples (TODO)
+## 🛠️ Examples
 
 
 Create a dynamic survey with branching logic:
@@ -50,7 +50,7 @@ Create a dynamic survey with branching logic:
 <html>
 <head>
   <title>RoundtableJS Example</title>
-  <script src="https://unpkg.com/roundtable-js@0.1.1/dist/roundtable.min.js"></script>
+  <script src="https://unpkg.com/roundtable-js@0.0.1/dist/roundtable.min.js"></script>
 </head>
 <body>
   <h1>RoundtableJS Demo</h1>
@@ -63,7 +63,7 @@ Create a dynamic survey with branching logic:
 
     // Add a new page
     const page = new RoundtableJS.Page('page1', 'Page 1');
-    page.addElement(new RoundtableJS.MultipleChoice('q1', 'What is your favorite animal?', ['Cat', 'Dog', 'Hamster']));
+    page.addElement(new RoundtableJS.MultipleSelect('q1', 'What is your favorite animal?', ['Cat', 'Dog', 'Hamster']));
     survey.addPage(page);
 
     // Render the survey
