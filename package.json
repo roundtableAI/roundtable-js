@@ -1,11 +1,11 @@
 {
   "name": "roundtable-js",
-  "version": "0.0.1-beta.3",
+  "version": "0.0.1-beta.4",
   "type": "module",
   "description": "A modular survey framework built with JavaScript",
-  "main": "controller.mjs",
+  "main": "index.mjs",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "http-server . -c-1"
   },
   "repository": {
     "type": "git",
