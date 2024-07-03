@@ -7,6 +7,14 @@
   "scripts": {
     "start": "http-server . -c-1"
   },
+  "files": [
+    "core/",
+    "question_types/",
+    "utils/",
+    "index.mjs",
+    "controller.mjs",
+    "README.md"
+  ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/roundtableai/roundtable-js.git"
