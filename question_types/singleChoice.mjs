@@ -1,5 +1,5 @@
 // singleChoice.js
-import Element from '../core/element.js';
+import Element from '../core/element.mjs';
 
 class SingleChoice extends Element {
     constructor(id, text, options, isDynamic = false, htmlContent = '') {

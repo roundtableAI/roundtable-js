@@ -1,8 +1,8 @@
 // Import core survey components
-import Survey from '../core/survey.js';
-import Page from '../core/page.js';
-import MultipleSelect from '../question_types/multipleSelect.js';
-import Grid from '../question_types/grid.js';
+import Survey from '../core/survey.mjs';
+import Page from '../core/page.mjs';
+import MultipleSelect from '../question_types/multipleSelect.mjs';
+import Grid from '../question_types/grid.mjs';
 
 // Define survey questions
 const surveyQuestions = [

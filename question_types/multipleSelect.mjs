@@ -1,4 +1,4 @@
-import Element from '../core/element.js';
+import Element from '../core/element.mjs';
 
 class MultipleSelect extends Element {
     constructor(id, text, options, isDynamic = false, htmlContent = '') {

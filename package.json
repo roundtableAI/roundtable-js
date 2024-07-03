@@ -1,24 +1,25 @@
 {
-    "name": "roundtable-js",
-    "version": "0.0.1",
-    "description": "A modular survey framework built with JavaScript",
-    "main": "controller.js",
-    "scripts": {
-      "test": "echo \"Error: no test specified\" && exit 1"
-    },
-    "repository": {
-      "type": "git",
-      "url": "git+https://github.com/roundtableai/roundtable-js.git"
-    },
-    "keywords": [
-      "survey",
-      "framework",
-      "javascript"
-    ],
-    "author": "Your Name",
-    "license": "Apache-2.0",
-    "bugs": {
-      "url": "https://github.com/roundtableai/roundtable-js/issues"
-    },
-    "homepage": "https://github.com/roundtableai/roundtable-js#readme"
-  }
+  "name": "roundtable-js",
+  "version": "0.0.1-beta.1",
+  "type": "module",
+  "description": "A modular survey framework built with JavaScript",
+  "main": "controller.mjs",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/roundtableai/roundtable-js.git"
+  },
+  "keywords": [
+    "survey",
+    "framework",
+    "javascript"
+  ],
+  "author": "Roundtable Technologies",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/roundtableai/roundtable-js/issues"
+  },
+  "homepage": "https://github.com/roundtableai/roundtable-js#readme"
+}

@@ -1,9 +1,9 @@
 // Import core survey components
-import Survey from '../core/survey.js';
-import Page from '../core/page.js';
-import MultipleSelect from '../question_types/multipleSelect.js';
-import SingleChoice from '../question_types/singleChoice.js';
-import Grid from '../question_types/grid.js';
+import Survey from '../core/survey.mjs';
+import Page from '../core/page.mjs';
+import MultipleSelect from '../question_types/multipleSelect.mjs';
+import SingleChoice from '../question_types/singleChoice.mjs';
+import Grid from '../question_types/grid.mjs';
 
 // Configuration for the dynamic generation of options based on previous selections
 const beverageOptionProvider = {

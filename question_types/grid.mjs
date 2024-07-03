@@ -1,4 +1,4 @@
-import Element from '../core/element.js';
+import Element from '../core/element.mjs';
 
 class Grid extends Element {
     constructor(id, text, rows, columns, isDynamic = false) {

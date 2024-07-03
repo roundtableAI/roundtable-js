@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>RoundtableJS Example</title>
+  <script src="https://unpkg.com/roundtable-js@0.0.1/dist/roundtable.min.js"></script>
+</head>
+<body>
+  <h1>RoundtableJS Demo</h1>
+  <div id="survey-container"></div>
+
+  <script>
+    // Use the RoundtableJS library
+    // Create a new survey
+    const survey = new RoundtableJS.Survey('my-survey', 'My Survey');
+
+    // Add a new page
+    const page = new RoundtableJS.Page('page1', 'Page 1');
+    page.addElement(new RoundtableJS.MultipleSelect('q1', 'What is your favorite animal?', ['Cat', 'Dog', 'Hamster']));
+    survey.addPage(page);
+
+    // Render the survey
+    survey.render();
+  </script>
+</body>
+</html>

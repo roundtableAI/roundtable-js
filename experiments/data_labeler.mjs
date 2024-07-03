@@ -1,7 +1,7 @@
 // data_labeler.js
-import Survey from '../core/survey.js';
-import Page from '../core/page.js';
-import SingleChoice from '../question_types/singleChoice.js';
+import Survey from '../core/survey.mjs';
+import Page from '../core/page.mjs';
+import SingleChoice from '../question_types/singleChoice.mjs';
 
 // Create and initialize a new survey
 const survey = new Survey('animalSurvey', 'Dog or Cat Identification Survey');

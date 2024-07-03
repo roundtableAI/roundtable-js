@@ -1,5 +1,5 @@
-import survey from './experiments/sandbox.js'; // Importing the initialized survey instance
-import { finishSurvey } from './utils/utils.js'; // Import the finishSurvey function from utils.js
+import survey from './experiments/sandbox.mjs'; // Importing the initialized survey instance
+import { finishSurvey } from './utils/utils.mjs'; // Import the finishSurvey function from utils.js
 
 // Function to display the current page of the survey
 function displayPage() {
