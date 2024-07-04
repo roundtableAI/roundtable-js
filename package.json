@@ -11,7 +11,6 @@
     "core/",
     "question_types/",
     "utils/",
-    "experiments/",
     "index.mjs",
     "controller.mjs",
     "README.md"
