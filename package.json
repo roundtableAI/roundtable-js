@@ -1,6 +1,6 @@
 {
   "name": "roundtable-js",
-  "version": "0.0.1-beta.4",
+  "version": "0.0.1-beta.6",
   "type": "module",
   "description": "A modular survey framework built with JavaScript",
   "main": "index.mjs",
@@ -11,6 +11,7 @@
     "core/",
     "question_types/",
     "utils/",
+    "experiments/",
     "index.mjs",
     "controller.mjs",
     "README.md"

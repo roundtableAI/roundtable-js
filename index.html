@@ -3,43 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Survey Application</title>
-    <!-- Add any CSS styling here -->
-    <style>
-        /* Example CSS for styling */
-        body {
-            font-family: Arial, sans-serif;
-            padding: 20px;
-        }
-        .survey-container {
-            max-width: 600px;
-            margin: 0 auto;
-        }
-        .question-container {
-            margin-bottom: 20px;
-        }
-        .survey-btn {
-            padding: 10px 20px;
-            background-color: #007bff;
-            color: white;
-            border: none;
-            cursor: pointer;
-        }
-    </style>
+    <title>My Survey</title>
 </head>
 <body>
-    <div class="survey-container">
-        <h1>Pulse Demo</h1>
-        <div id="question-container" class="question-container">
-            <!-- Questions will be dynamically added here -->
-        </div>
-        <div id="progress">
-            <!-- Survey progress will be displayed here -->
-        </div>
-        <button id="submit-btn" class="survey-btn" style="display: none;">Submit</button>
+    <div id="survey-container">
+        <div id="progress"></div>
+        <form id="survey-form">
+            <div id="question-container"></div>
+            <button type="submit" id="submit-button">Next</button>
+        </form>
     </div>
-
-    <!-- Include your main.js script -->
-    <script type="module" src="index.mjs"></script>
+    <script type="module" src="script.js"></script>
 </body>
 </html>
