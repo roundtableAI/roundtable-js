@@ -7,11 +7,16 @@ We believe that well-crafted surveys lead to better data, and better data leads 
 <br/>
 
 <p align="center">
-  <a href="https://github.com/roundtableAI/roundtable-js/stargazers"><img src="https://img.shields.io/github/stars/roundtableAI/roundtable-js" alt="Github Stars"></a>
+  <!-- GitHub Stars -->
+  <a href="https://github.com/roundtableAI/roundtable-js/stargazers"><img src="https://img.shields.io/github/stars/roundtableAI/roundtable-js" alt="GitHub Stars"></a>
+  <!-- NPM Downloads -->
+  <a href="https://www.npmjs.com/package/roundtable-js"><img src="https://img.shields.io/npm/dm/roundtable-js" alt="NPM Downloads"></a>
+  <!-- Twitter Follow -->
+  <a href="https://twitter.com/roundtableDOTai"><img src="https://img.shields.io/twitter/follow/roundtableDOTai?style=social" alt="Twitter Follow"></a>
+  <!-- Hacker News -->
   <a href="https://news.ycombinator.com/item?id=36865625"><img src="https://img.shields.io/badge/Hacker%20News-121-%23FF6600" alt="Hacker News"></a>
-  <a href="https://github.com/roundtableAI/roundtable-js/LICENSE"><img src="https://img.shields.io/badge/license-AGPLv3-purple" alt="License"></a>
-  <a href="https://twitter.com/roundtableDOTai"><img src="https://img.shields.io/twitter/follow/roundtableDOTai?style=flat"></a>
-  <a href="https://www.ycombinator.com"><img src="https://img.shields.io/badge/Backed%20by-Y%20Combinator-%23f26625"></a>
+  <!-- Y Combinator -->
+  <a href="https://www.ycombinator.com"><img src="https://img.shields.io/badge/Backed%20by-Y%20Combinator-%23f26625" alt="Y Combinator"></a>
 </p>
 
 We get excited about open-source enterprise-grade programmatic survey software. Do you?
@@ -124,10 +129,18 @@ Whether you're conducting market research, gathering academic data, or measuring
 Read our [full documentation](https://docs.roundtable.ai).
 
 ## 🛠️ Development / Open-Source Community
+
 <p align="center">
-  <a href="https://codecov.io/gh/roundtableAI/roundtable-js"><img src="https://codecov.io/gh/roundtableAI/roundtable-js/branch/main/graph/badge.svg" alt="Coverage"></a>
-  <a href="https://github.com/roundtableAI/roundtable-js/issues"><img src="https://img.shields.io/github/issues/roundtableAI/roundtable-js" alt="Issues"></a>
-  <a href="https://github.com/roundtableAI/roundtable-js/pulls"><img src="https://img.shields.io/github/issues-pr/roundtableAI/roundtable-js" alt="Pull Requests"></a>
+  <!-- Build Status -->
+  <a href="https://github.com/roundtableAI/roundtable-js/actions"><img src="https://img.shields.io/github/actions/workflow/status/roundtableAI/roundtable-js/main.yml" alt="Build Status"></a>
+  <!-- Code Coverage -->
+  <a href="https://codecov.io/gh/roundtableAI/roundtable-js"><img src="https://codecov.io/gh/roundtableAI/roundtable-js/branch/main/graph/badge.svg" alt="Code Coverage"></a>
+  <!-- Maintainability -->
+  <a href="https://codeclimate.com/github/roundtableAI/roundtable-js/maintainability"><img src="https://api.codeclimate.com/v1/badges/your_badge_id/maintainability" alt="Maintainability"></a>
+  <!-- Dependencies -->
+  <a href="https://david-dm.org/roundtableAI/roundtable-js"><img src="https://img.shields.io/david/roundtableAI/roundtable-js" alt="Dependencies"></a>
+  <!-- Open Source Love -->
+  <a href="https://github.com/roundtableAI/roundtable-js"><img src="https://badges.frapsoft.com/os/v1/open-source.svg?v=103" alt="Open Source Love"></a>
 </p>
 
 We love contributions! Please see our [Contributing Guide](CONTRIBUTING.md) TODO
@@ -139,10 +152,11 @@ Roundtable is open source software [licensed](LICENSE).
 ## 🎉 Community
 
 Join our community:
-- [Slack](TODO)
+- [Slack](https://join.slack.com/t/roundtablejs/shared_invite/zt-2m09n74yv-B~UeGbxSzGMTO3f0qXhRxQ)
 - [Twitter](https://twitter.com/roundtableDOTai)
 - [Blog](https://roundtable.ai/blog)
+- [LinkedIn](https://www.linkedin.com/company/roundtableAI)
 
-## 📖 Story
+---
 
-Happy surveying! 📊✨
+Thank you for choosing Roundtable for your survey needs. Engage with our community, contribute to the project, and let's build something great together. 📊✨
