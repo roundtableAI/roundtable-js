@@ -143,7 +143,7 @@ Read our [full documentation](https://docs.roundtable.ai).
   <a href="https://github.com/roundtableAI/roundtable-js"><img src="https://badges.frapsoft.com/os/v1/open-source.svg?v=103" alt="Open Source Love"></a>
 </p>
 
-We love contributions! Please see our [Contributing Guide](CONTRIBUTING.md) TODO
+Please see our [Contributing Guide](CONTRIBUTING.md).
 
 ## 📜 License
 
