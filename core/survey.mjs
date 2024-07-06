@@ -28,6 +28,11 @@ class Survey {
         if (this.isComplete()) {
             return null;
         }
+
+        // Apply logic rules at the beginning of every page
+        const currentPageId = this.pages[this.currentPageIndex].id;
+        this.applyLogicRules(currentPageId);
+
         const page = this.pages[this.currentPageIndex];
         return this.applyPiping(page);
     }
@@ -54,9 +59,6 @@ class Survey {
     submitData(data) {
         Object.assign(this.data, data);
 
-        // Logic to determine if page should change
-        this.applyLogicRules();
-
         if (this.isComplete()) {
             return null;
         }
@@ -66,10 +68,10 @@ class Survey {
         return this.getCurrentPage();
     }
     
-    applyLogicRules() {
+    applyLogicRules(currentPageId) {
         for (const rule of this.logicRules) {
-            if (rule.condition(this.data, this.currentPageIndex, this.pages)) {
-                rule.action(this.data, this);
+            if (rule.condition(this.data, currentPageId, this.pages)) {
+                rule.action(this.data, this, currentPageId);
             }
         }
     }
