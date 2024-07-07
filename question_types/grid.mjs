@@ -1,11 +1,10 @@
 import Element from '../core/element.mjs';
 
 class Grid extends Element {
-    constructor(id, text, rows, columns, isDynamic = false) {
+    constructor(id, text, rows, columns) {
         super(id, 'grid', text);
         this.rows = rows;
         this.columns = columns;
-        this.isDynamic = isDynamic;
     }
 
     render(data) {
@@ -70,7 +69,7 @@ class Grid extends Element {
     }
 
     clone() {
-        return new Grid(this.id, this.text, this.rows, this.columns, this.isDynamic);
+        return new Grid(this.id, this.text, this.rows, this.columns);
     }
 }
 

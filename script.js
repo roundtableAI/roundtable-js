@@ -28,39 +28,39 @@ page3.addElement(new Grid('q3_2', 'Please rate your satisfaction with the follow
 ));
 survey.addPage(page3);
 
-// // Define logic rules to dynamically add questions and pages
-// survey.addLogicRule(
-//     (data, currentPageId) => currentPageId === 'page3' && data.q1 === 'Dog',
-//     (data, survey) => {
-//         const page3 = survey.pages.find(page => page.id === 'page3');
-//         if (page3 && !page3.elements.some(element => element.id === 'q3_3')) {
-//             page3.addElement(new OpenEnded('q3_3', 'What is the best thing about having a dog?', 200, true));
-//         }
-//     }
-// );
+// Define logic rules to dynamically add questions and pages
+survey.addLogicRule(
+    (data, currentPageId) => currentPageId === 'page3' && data.q1 === 'Dog',
+    (data, survey) => {
+        const page3 = survey.pages.find(page => page.id === 'page3');
+        if (page3 && !page3.elements.some(element => element.id === 'q3_3')) {
+            page3.addElement(new OpenEnded('q3_3', 'What is the best thing about having a dog?', 200, true));
+        }
+    }
+);
 
-// // Add logic rules to dynamically create and insert pages at the end
-// survey.addLogicRule(
-//     (data, currentPageId) => currentPageId === 'page1' && data.q1 === 'Cat',
-//     (data, survey) => {
-//         if (!survey.pages.some(page => page.id === 'page4')) {
-//             const page4 = new Page('page4');
-//             page4.addElement(new OpenEnded('q4_1', 'What is the best thing about having a cat?', 200, true));
-//             survey.addPage(page4);
-//         }
-//     }
-// );
+// Add logic rules to dynamically create and insert pages at the end
+survey.addLogicRule(
+    (data, currentPageId) => currentPageId === 'page1' && data.q1 === 'Cat',
+    (data, survey) => {
+        if (!survey.pages.some(page => page.id === 'page4')) {
+            const page4 = new Page('page4');
+            page4.addElement(new OpenEnded('q4_1', 'What is the best thing about having a cat?', 200, true));
+            survey.addPage(page4);
+        }
+    }
+);
 
-// survey.addLogicRule(
-//     (data, currentPageId) => currentPageId === 'page3' && Array.isArray(data.q3_1) && data.q3_1.includes('Dog'),
-//     (data, survey) => {
-//         if (!survey.pages.some(page => page.id === 'page5')) {
-//             const page5 = new Page('page5');
-//             page5.addElement(new OpenEnded('q5_1', 'What activities do you do with your dogs?', 200, true));
-//             survey.addPage(page5);
-//         }
-//     }
-// );
+survey.addLogicRule(
+    (data, currentPageId) => currentPageId === 'page3' && Array.isArray(data.q3_1) && data.q3_1.includes('Dog'),
+    (data, survey) => {
+        if (!survey.pages.some(page => page.id === 'page5')) {
+            const page5 = new Page('page5');
+            page5.addElement(new OpenEnded('q5_1', 'What activities do you do with your dogs?', 200, true));
+            survey.addPage(page5);
+        }
+    }
+);
 
 document.addEventListener('DOMContentLoaded', () => {
     renderSurvey();

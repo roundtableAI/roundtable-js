@@ -1,14 +1,13 @@
 import Element from '../core/element.mjs';
 
 class OpenEnded extends Element {
-    constructor(id, text, maxLength, isDynamic = false) {
+    constructor(id, text, maxLength) {
         super(id, 'openEnded', text);
         this.maxLength = maxLength;
-        this.isDynamic = isDynamic;
     }
 
     render(data) {
-        const renderedText = this.isDynamic ? this.replacePlaceholders(this.text, data) : this.text;
+        const renderedText = this.replacePlaceholders(this.text, data);
         return `
             <div class="question open-ended">
                 <p>${renderedText}</p>
@@ -29,7 +28,7 @@ class OpenEnded extends Element {
     }
 
     clone() {
-        return new OpenEnded(this.id, this.text, this.maxLength, this.isDynamic);
+        return new OpenEnded(this.id, this.text, this.maxLength);
     }
 
     replacePlaceholders(text, data) {

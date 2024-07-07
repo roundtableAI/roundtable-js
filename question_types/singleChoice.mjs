@@ -1,18 +1,9 @@
 import Element from '../core/element.mjs';
 
 class SingleChoice extends Element {
-    constructor(id, text, options, isDynamic = false, htmlContent = '') {
+    constructor(id, text, options, htmlContent = '') {
         super(id, 'singleChoice', text);
-        if (isDynamic) {
-            if (typeof options !== 'function') {
-                console.error("Dynamic options must be provided as a function");
-                this.optionGenerator = () => [];
-            } else {
-                this.optionGenerator = options;
-            }
-        } else {
-            this.optionGenerator = () => options;
-        }
+        this.optionGenerator = typeof options === 'function' ? options : () => options;
         this.htmlContent = htmlContent;
     }
 
@@ -49,7 +40,7 @@ class SingleChoice extends Element {
     }
 
     clone() {
-        return new SingleChoice(this.id, this.text, this.optionGenerator, typeof this.optionGenerator === 'function', this.htmlContent);
+        return new SingleChoice(this.id, this.text, this.optionGenerator, this.htmlContent);
     }
 
     replacePlaceholders(text, data) {

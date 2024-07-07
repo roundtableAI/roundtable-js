@@ -1,19 +1,10 @@
 import Element from '../core/element.mjs';
 
 class MultipleSelect extends Element {
-    constructor(id, text, options, isDynamic = false, htmlContent = '') {
+    constructor(id, text, options, htmlContent = '') {
         super(id, 'multipleSelect', text);
-        if (isDynamic) {
-            if (typeof options !== 'function') {
-                console.error("Dynamic options must be provided as a function");
-                this.optionGenerator = () => [];
-            } else {
-                this.optionGenerator = options;
-            }
-        } else {
-            this.optionGenerator = () => options;
-        }
-        this.htmlContent = htmlContent; // New property to store additional HTML content
+        this.optionGenerator = typeof options === 'function' ? options : () => options;
+        this.htmlContent = htmlContent; // Property to store additional HTML content
     }
 
     render(data) {
@@ -49,7 +40,7 @@ class MultipleSelect extends Element {
     }
 
     clone() {
-        return new MultipleSelect(this.id, this.text, this.optionGenerator, typeof this.optionGenerator === 'function', this.htmlContent);
+        return new MultipleSelect(this.id, this.text, this.optionGenerator, this.htmlContent);
     }
 
     replacePlaceholders(text, data) {
