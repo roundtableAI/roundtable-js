@@ -3,6 +3,7 @@ class Element {
         this.id = id;
         this.type = type;
         this.text = text;
+        this.data = {};  // Initialize data property
     }
 
     replacePlaceholders(text, data) {
@@ -19,6 +20,25 @@ class Element {
         return `<div class="question ${this.type}">
                     <p>${renderedText}</p>
                 </div>`;
+    }
+
+    getData() {
+        return {
+            metadata: {
+                id: this.id,
+                type: this.type,
+                text: this.text
+            },
+            value: this.data[this.id] || null
+        };
+    }
+
+    addData(data) {
+        this.data = { ...this.data, ...data };
+    }
+
+    addListener(data) {
+        // This should be overridden by subclasses if needed
     }
 
     clone() {

@@ -37,7 +37,16 @@ class MultipleSelect extends Element {
 
     getData() {
         return Array.from(document.querySelectorAll(`input[name="${this.id}"]:checked`)).map(input => input.value);
-    }    
+    }
+
+    addListener(data) {
+        const checkboxes = document.querySelectorAll(`input[name="${this.id}"]`);
+        checkboxes.forEach(checkbox => {
+            checkbox.addEventListener('change', () => {
+                data[this.id] = this.getData();
+            });
+        });
+    }
 
     clone() {
         return new MultipleSelect(this.id, this.text, this.optionGenerator, typeof this.optionGenerator === 'function', this.htmlContent);

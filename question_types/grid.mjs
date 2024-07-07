@@ -34,7 +34,7 @@ class Grid extends Element {
                                 <td>${this.replacePlaceholders(row, data)}</td>
                                 ${columns.map((column, colIndex) => `
                                     <td>
-                                        <input type="radio" name="${this.id}_${row}" value="${column}">
+                                        <input type="radio" name="${row}" value="${column}">
                                     </td>
                                 `).join('')}
                             </tr>
@@ -46,18 +46,28 @@ class Grid extends Element {
     }
 
     getData() {
-        const data = {};
-        document.querySelectorAll(`input[name^="${this.id}_"]:checked`).forEach(input => {
-            const [prefix, ...rowParts] = input.name.split('_');
-            const row = rowParts.join('_');  // Rejoin row parts to handle any underscores in the row name
-            if (!data[prefix]) {
-                data[prefix] = [];
+        const data = [];
+        const rows = typeof this.rows === 'function' ? this.rows({}) : this.rows;
+        rows.forEach(row => {
+            const selectedInput = document.querySelector(`input[name="${row}"]:checked`);
+            if (selectedInput) {
+                data.push({ row, column: selectedInput.value });
             }
-            data[prefix].push({ row, column: input.value });
         });
-        return data[this.id];
+        return data;
     }
-    
+
+    addListener(data) {
+        const rows = typeof this.rows === 'function' ? this.rows(data) : this.rows;
+        rows.forEach(row => {
+            const inputs = document.querySelectorAll(`input[name="${row}"]`);
+            inputs.forEach(input => {
+                input.addEventListener('change', () => {
+                    data[this.id] = this.getData();
+                });
+            });
+        });
+    }
 
     clone() {
         return new Grid(this.id, this.text, this.rows, this.columns, this.isDynamic);

@@ -23,6 +23,14 @@ class Page {
         return ''; // Return an empty string if the condition is not met
     }
 
+    getData() {
+        return this.elements.map(element => element.getData());
+    }
+
+    addData(data) {
+        this.elements.forEach(element => element.addData(data));
+    }
+
     validate(responses) {
         if (!this.conditionFunction(responses)) {
             return true; // Automatically validate the page if it's not displayed

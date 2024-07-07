@@ -29,10 +29,6 @@ class Survey {
             return null;
         }
 
-        // Apply logic rules at the beginning of every page
-        const currentPageId = this.pages[this.currentPageIndex].id;
-        this.applyLogicRules(currentPageId);
-
         const page = this.pages[this.currentPageIndex];
         return this.applyPiping(page);
     }
@@ -56,8 +52,9 @@ class Survey {
         }
     }
 
-    submitData(data) {
-        Object.assign(this.data, data);
+    submitData() {
+        const currentPageId = this.pages[this.currentPageIndex].id;
+        this.applyLogicRules(currentPageId);
 
         if (this.isComplete()) {
             return null;
@@ -116,6 +113,14 @@ class Survey {
         this.logicRules.push({ condition, action });
     }
 
+    getData() {
+        return this.pages.map(page => page.getData());
+    }
+
+    addData(key, value) {
+        this.pages.forEach(page => page.addData({ [key]: value }));
+    }
+
     render() {
         const currentPage = this.getCurrentPage();
         if (!currentPage) {
@@ -127,6 +132,9 @@ class Survey {
         if (questionContainer) {
             questionContainer.innerHTML = currentPage.render(this.data);
 
+            // Add event listeners to elements
+            this.addElementListeners(currentPage);
+
             // Update progress or other UI elements as needed
             const progress = this.getProgress();
             const progressElement = document.getElementById('progress');
@@ -136,6 +144,14 @@ class Survey {
         } else {
             console.error('Question container element not found.');
         }
+    }
+
+    addElementListeners(page) {
+        page.elements.forEach(element => {
+            if (element.addListener) {
+                element.addListener(this.data);
+            }
+        });
     }
 
     endSurvey() {

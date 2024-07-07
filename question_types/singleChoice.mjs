@@ -1,4 +1,3 @@
-// singleChoice.js
 import Element from '../core/element.mjs';
 
 class SingleChoice extends Element {
@@ -38,6 +37,15 @@ class SingleChoice extends Element {
     getData() {
         const selectedOption = document.querySelector(`input[name="${this.id}"]:checked`);
         return selectedOption ? selectedOption.value : null;
+    }
+
+    addListener(data) {
+        const inputs = document.querySelectorAll(`input[name="${this.id}"]`);
+        inputs.forEach(input => {
+            input.addEventListener('change', () => {
+                data[this.id] = this.getData();
+            });
+        });
     }
 
     clone() {

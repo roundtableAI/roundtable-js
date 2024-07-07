@@ -21,6 +21,13 @@ class OpenEnded extends Element {
         return document.getElementById(this.id).value;
     }
 
+    addListener(data) {
+        const textarea = document.getElementById(this.id);
+        textarea.addEventListener('input', () => {
+            data[this.id] = this.getData();
+        });
+    }
+
     clone() {
         return new OpenEnded(this.id, this.text, this.maxLength, this.isDynamic);
     }
