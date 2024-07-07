@@ -8,24 +8,34 @@ import Grid from './question_types/grid.mjs';
 // Create a new survey instance
 const survey = new Survey('complex-survey', 'Complex Survey');
 
-// Add the first page with a single-choice question
-const page1 = new Page('page1');
-page1.addElement(new SingleChoice('q1', 'What is your favorite animal?', ['Cat', 'Dog', 'Hamster']));
-survey.addPage(page1);
-
-// Add the second page with two questions, including piping
-const page2 = new Page('page2');
-page2.addElement(new SingleChoice('q2_1', 'Why do you like {{q1}}s?', ['They are cute', 'They are friendly', 'They are low maintenance']));
-page2.addElement(new OpenEnded('q2_2', 'Please describe your ideal {{q1}}.', 200, true));
-survey.addPage(page2);
-
-// Add the third page with two questions initially
-const page3 = new Page('page3');
-page3.addElement(new MultipleSelect('q3_1', 'Which of these animals do you have at home?', ['Cat', 'Dog', 'Hamster', 'Fish', 'Bird']));
-page3.addElement(new Grid('q3_2', 'Please rate your satisfaction with the following pet attributes:',
+// Define questions
+const q1 = new SingleChoice('q1', 'What is your favorite animal?', ['Cat', 'Dog', 'Hamster']);
+const q2_1 = new SingleChoice('q2_1', 'Why do you like {{q1}}s?', ['They are cute', 'They are friendly', 'They are low maintenance']);
+const q2_2 = new OpenEnded('q2_2', 'Please describe your ideal {{q1}}.', 200);
+const q3_1 = new MultipleSelect('q3_1', 'Which of these animals do you have at home?', ['Cat', 'Dog', 'Hamster', 'Fish', 'Bird']);
+const q3_2 = new Grid('q3_2', 'Please rate your satisfaction with the following pet attributes:',
     ['Friendliness', 'Cleanliness', 'Maintenance'],
     ['Very Satisfied', 'Satisfied', 'Neutral', 'Dissatisfied', 'Very Dissatisfied']
-));
+);
+const q3_3 = new OpenEnded('q3_3', 'What is the best thing about having a dog?', 200);
+const q4_1 = new OpenEnded('q4_1', 'What is the best thing about having a cat?', 200);
+const q5_1 = new OpenEnded('q5_1', 'What activities do you do with your dogs?', 200);
+
+// Define pages
+const page1 = new Page('page1');
+page1.addElement(q1);
+
+const page2 = new Page('page2');
+page2.addElement(q2_1);
+page2.addElement(q2_2);
+
+const page3 = new Page('page3');
+page3.addElement(q3_1);
+page3.addElement(q3_2);
+
+// Add pages to the survey
+survey.addPage(page1);
+survey.addPage(page2);
 survey.addPage(page3);
 
 // Define logic rules to dynamically add questions and pages
@@ -34,18 +44,17 @@ survey.addLogicRule(
     (data, survey) => {
         const page3 = survey.pages.find(page => page.id === 'page3');
         if (page3 && !page3.elements.some(element => element.id === 'q3_3')) {
-            page3.addElement(new OpenEnded('q3_3', 'What is the best thing about having a dog?', 200, true));
+            page3.addElement(q3_3);
         }
     }
 );
 
-// Add logic rules to dynamically create and insert pages at the end
 survey.addLogicRule(
     (data, currentPageId) => currentPageId === 'page1' && data.q1 === 'Cat',
     (data, survey) => {
         if (!survey.pages.some(page => page.id === 'page4')) {
             const page4 = new Page('page4');
-            page4.addElement(new OpenEnded('q4_1', 'What is the best thing about having a cat?', 200, true));
+            page4.addElement(q4_1);
             survey.addPage(page4);
         }
     }
@@ -56,7 +65,7 @@ survey.addLogicRule(
     (data, survey) => {
         if (!survey.pages.some(page => page.id === 'page5')) {
             const page5 = new Page('page5');
-            page5.addElement(new OpenEnded('q5_1', 'What activities do you do with your dogs?', 200, true));
+            page5.addElement(q5_1);
             survey.addPage(page5);
         }
     }
