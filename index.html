@@ -1,18 +1,29 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Survey</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Survey</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    .hidden {
+      display: none;
+    }
+  </style>
 </head>
+
 <body>
-    <div id="survey-container">
-        <div id="progress"></div>
-        <form id="survey-form">
-            <div id="question-container"></div>
-            <button type="submit" id="submit-button">Next</button>
-        </form>
+  <div id="survey-container" class="hidden">
+    <div id="page-container"></div>
+    <div id="navigation">
+      <button id="next-button">Next</button>
     </div>
-    <script type="module" src="script.js"></script>
+  </div>
+  <script type="module" src="scripts/loop-through-multi-select.js""></script>
 </body>
+
 </html>
