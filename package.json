@@ -3,7 +3,7 @@
   "version": "0.0.1-beta.6",
   "type": "module",
   "description": "A modular survey framework built with JavaScript",
-  "main": "index.mjs",
+  "main": "index.js",
   "scripts": {
     "start": "http-server . -c-1"
   },
@@ -11,8 +11,7 @@
     "core/",
     "question_types/",
     "utils/",
-    "index.mjs",
-    "controller.mjs",
+    "index.js",
     "README.md"
   ],
   "repository": {
