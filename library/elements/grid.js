@@ -1,13 +1,14 @@
 import Element from '../core/element.js';
 
 class Grid extends Element {
-    static styleKeys = ['root', 'label', 'subText', 'table', 'headerRow', 'headerCell', 'row', 'rowLabel', 'cell', 'radio', 'errorMessage'];
+    static styleKeys = ['root', 'innerContainer', 'label', 'subText', 'table', 'headerRow', 'headerCell', 'row', 'rowLabel', 'cell', 'radio', 'errorMessage'];
 
     static defaultStyles = {
         root: { 
             marginBottom: '20px',
             borderRadius: '5px'
         },
+        innerContainer: { },
         label: { 
             display: 'block',
             marginBottom: '5px',
@@ -25,7 +26,7 @@ class Grid extends Element {
             borderCollapse: 'collapse'
         },
         headerRow: {
-            backgroundColor: '#e9ecef'
+            backgroundColor: '#f2f2f2'
         },
         headerCell: {
             padding: '10px',
@@ -47,30 +48,53 @@ class Grid extends Element {
         radio: {
             margin: '0 auto'
         },
-        errorMessage: {}
+        errorMessage: {
+            color: '#fa5252',
+            fontSize: '0.9em',
+            marginTop: '5px',
+        }
     };
 
-    constructor({ id, text, subText = '', rows, columns, required = true, randomizeRows = false, randomizeColumns = false, styles = {} }) {
+    constructor({ 
+        id, 
+        text, 
+        subText = '', 
+        rows, 
+        columns, 
+        required = true, 
+        randomizeRows = false, 
+        randomizeColumns = false, 
+        styles = {} 
+    }) {
         super({ id, type: 'grid', store_data: true, required });
+
+        if (!Array.isArray(rows) || rows.length === 0 || !Array.isArray(columns) || columns.length === 0) {
+            throw new Error('Rows and columns must be non-empty arrays');
+        }
+
         this.text = text;
         this.subText = subText;
         this.rows = rows;
         this.columns = columns;
-        this.randomizeRows = randomizeRows;
-        this.randomizeColumns = randomizeColumns;
-        this.styles = this.mergeStyles(Grid.defaultStyles, styles);
+        this.randomizeRows = Boolean(randomizeRows);
+        this.randomizeColumns = Boolean(randomizeColumns);
+
+        this.mergeStyles(Grid.defaultStyles, styles);
+
         this.addData('text', text);
         this.addData('subText', subText);
         this.addData('rows', rows);
         this.addData('columns', columns);
-        this.addData('randomizeRows', randomizeRows);
-        this.addData('randomizeColumns', randomizeColumns);
-        this.setResponse({});
+        this.addData('randomizeRows', this.randomizeRows);
+        this.addData('randomizeColumns', this.randomizeColumns);
+
+        this.setInitialResponse({});
     }
 
     getSelectorForKey(key) {
         const selectorMap = {
             root: '',
+            innerContainer: `#${this.id}-inner-container`,
             label: '.question-label',
             subText: '.question-subtext',
             table: 'table',
@@ -108,17 +132,16 @@ class Grid extends Element {
             </tr>
         `).join('');
 
-        const styleString = this.generateStylesheet();
-
         return `
-            <style>${styleString}</style>
             <div class="grid-question" id="${this.id}-container">
-                <label class="question-label">${this.text}</label>
-                ${this.subText ? `<span class="question-subtext">${this.subText}</span>` : ''}
-                <table>
-                    <thead>${headerRow}</thead>
-                    <tbody>${bodyRows}</tbody>
-                </table>
+                <div id="${this.id}-inner-container">
+                    <label class="question-label">${this.text}</label>
+                    ${this.subText ? `<span class="question-subtext">${this.subText}</span>` : ''}
+                    <table>
+                        <thead>${headerRow}</thead>
+                        <tbody>${bodyRows}</tbody>
+                    </table>
+                </div>
                 <div id="${this.id}-error" class="error-message" style="display: none;"></div>
             </div>
         `;
@@ -130,11 +153,13 @@ class Grid extends Element {
 
     attachEventListeners() {
         const container = document.getElementById(`${this.id}-container`);
-        container.addEventListener('change', (e) => {
-            if (e.target.type === 'radio') {
-                this.updateResponse();
-            }
-        });
+        this.addEventListenerWithTracking(container, 'change', this.handleChange.bind(this));
+    }
+
+    handleChange(e) {
+        if (e.target.type === 'radio') {
+            this.updateResponse();
+        }
     }
 
     updateResponse() {
@@ -160,6 +185,8 @@ class Grid extends Element {
         
         if (showError && !isValid) {
             this.showValidationError(`Please provide a response for all rows. Missing: ${unansweredRows.join(', ')}`);
+        } else {
+            this.showValidationError('');
         }
 
         return isValid;

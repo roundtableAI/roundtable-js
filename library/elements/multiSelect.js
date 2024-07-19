@@ -1,13 +1,14 @@
 import Element from '../core/element.js';
 
 class MultiSelect extends Element {
-    static styleKeys = ['root', 'label', 'subText', 'optionsContainer', 'option', 'checkbox', 'errorMessage'];
+    static styleKeys = ['root', 'innerContainer','label', 'subText', 'optionsContainer', 'option', 'checkbox', 'errorMessage'];
 
     static defaultStyles = {
         root: { 
             marginBottom: '20px',
             borderRadius: '5px',
         },
+        innerContainer: { },
         label: { 
             display: 'block',
             marginBottom: '5px',
@@ -30,30 +31,55 @@ class MultiSelect extends Element {
         checkbox: {
             marginRight: '5px'
         },
-        errorMessage: {}
+        errorMessage: {
+            color: '#fa5252',
+            fontSize: '0.9em',
+            marginTop: '5px',
+        }
     };
 
-    constructor({ id, text, subText = '', options, required = true, randomize = false, minSelected = 0, maxSelected = null, styles = {} }) {
+    constructor({ 
+        id, 
+        text, 
+        subText = '', 
+        options, 
+        required = true, 
+        randomize = false, 
+        minSelected = 0, 
+        maxSelected = null, 
+        styles = {} 
+    }) {
         super({ id, type: 'multi-select', store_data: true, required });
+
+        if (!Array.isArray(options) || options.length === 0) {
+            throw new Error('Options must be a non-empty array');
+        }
+        if (minSelected < 0 || (maxSelected !== null && minSelected > maxSelected)) {
+            throw new Error('Invalid minSelected or maxSelected values');
+        }
+
         this.text = text;
         this.subText = subText;
         this.options = options;
-        this.randomize = randomize;
+        this.randomize = Boolean(randomize);
         this.minSelected = minSelected;
         this.maxSelected = maxSelected;
-        this.styles = this.mergeStyles(MultiSelect.defaultStyles, styles);
+
+        this.mergeStyles(MultiSelect.defaultStyles, styles);
+
         this.addData('text', text);
         this.addData('subText', subText);
         this.addData('options', options);
-        this.addData('randomize', randomize);
+        this.addData('randomize', this.randomize);
         this.addData('minSelected', minSelected);
         this.addData('maxSelected', maxSelected);
-        this.setResponse([]);
+        this.setInitialResponse([]);
     }
 
     getSelectorForKey(key) {
         const selectorMap = {
             root: '',
+            innerContainer: `#${this.id}-inner-container`,
             label: '.question-label',
             subText: '.question-subtext',
             optionsContainer: '.options-container',
@@ -74,15 +100,14 @@ class MultiSelect extends Element {
             </div>
         `).join('');
 
-        const styleString = this.generateStylesheet();
-
         return `
-            <style>${styleString}</style>
             <div class="multi-select-question" id="${this.id}-container">
-                <label class="question-label">${this.text}</label>
-                ${this.subText ? `<span class="question-subtext">${this.subText}</span>` : ''}
-                <div class="options-container">
-                    ${optionsString}
+                <div id="${this.id}-inner-container">
+                    <label class="question-label">${this.text}</label>
+                    ${this.subText ? `<span class="question-subtext">${this.subText}</span>` : ''}
+                    <div class="options-container">
+                        ${optionsString}
+                    </div>
                 </div>
                 <div id="${this.id}-error" class="error-message" style="display: none;"></div>
             </div>
@@ -99,11 +124,13 @@ class MultiSelect extends Element {
 
     attachEventListeners() {
         const container = document.getElementById(`${this.id}-container`);
-        container.addEventListener('change', (e) => {
-            if (e.target.type === 'checkbox') {
-                this.updateResponse();
-            }
-        });
+        this.addEventListenerWithTracking(container, 'change', this.handleChange.bind(this));
+    }
+
+    handleChange(e) {
+        if (e.target.type === 'checkbox') {
+            this.updateResponse();
+        }
     }
 
     updateResponse() {
@@ -136,6 +163,8 @@ class MultiSelect extends Element {
 
         if (showError) {
             this.showValidationError(errorMessage);
+        } else {
+            this.showValidationError('');
         }
 
         return isValid;

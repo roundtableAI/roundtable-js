@@ -1,8 +1,8 @@
-import Survey from '../core/survey.js';
-import OpenEnd from '../question_types/openEnd.js';
-import SingleSelect from '../question_types/singleSelect.js';
-import MultiSelect from '../question_types/multiSelect.js';
-import HTML from '../question_types/HTML.js';
+import Survey from '../../library/core/survey.js';
+import OpenEnd from '../../library/elements/openEnd.js';
+import HTML from '../../library/elements/HTML.js';
+import MultiSelect from '../../library/elements/multiSelect.js';
+import SingleSelect from '../../library/elements/singleSelect.js';
 
 async function addPage1(survey) {
     
@@ -27,9 +27,10 @@ async function addPage1(survey) {
 }
 
 async function addOpenEndPageAboutAnimal(survey,animal) {
+    const animalString = animal === 'Fish' ? 'Fish' : `${animal}s`;
     const q2 = new OpenEnd({
         id: 'q2',
-        text: `What do you like about ${animal}s?`,
+        text: `What do you like about ${animalString}?`,
         // minLength: 10,
         // maxLength: 200,
     });
@@ -67,8 +68,7 @@ async function runSurvey() {
         await addCloseEndPageAboutAnimal(survey,likedAnimals[i]);
     }
     await finalPage(survey);
-
-    survey.finishSurvey({ message: 'Thank you for completing the survey!' });
+    survey.finishSurvey( 'Thank you for completing the survey!' );
 }
 
 runSurvey();

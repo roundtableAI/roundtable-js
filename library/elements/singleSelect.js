@@ -1,13 +1,14 @@
 import Element from '../core/element.js';
 
 class SingleSelect extends Element {
-    static styleKeys = ['root', 'label', 'subText', 'optionsContainer', 'option', 'radio', 'errorMessage'];
+    static styleKeys = ['root', 'innerContainer' ,'label', 'subText', 'optionsContainer', 'option', 'radio', 'errorMessage'];
 
     static defaultStyles = {
         root: { 
             marginBottom: '20px',
             borderRadius: '5px'
         },
+        innerContainer: {  },
         label: { 
             display: 'block',
             marginBottom: '5px',
@@ -30,26 +31,39 @@ class SingleSelect extends Element {
         radio: {
             marginRight: '5px'
         },
-        errorMessage: {}
+        errorMessage: {
+            color: '#fa5252',
+            fontSize: '0.9em',
+            marginTop: '5px'
+        }
     };
 
     constructor({ id, text, subText = '', options, required = true, randomize = false, styles = {} }) {
         super({ id, type: 'single-select', store_data: true, required });
+        
+        if (!Array.isArray(options) || options.length === 0) {
+            throw new Error('Options must be a non-empty array');
+        }
+
         this.text = text;
         this.subText = subText;
         this.options = options;
-        this.randomize = randomize;
-        this.styles = this.mergeStyles(SingleSelect.defaultStyles, styles);
+        this.randomize = Boolean(randomize);
+        
+        this.mergeStyles(SingleSelect.defaultStyles, styles);
+        
         this.addData('text', text);
         this.addData('subText', subText);
         this.addData('options', options);
-        this.addData('randomize', randomize);
-        this.setResponse('');
+        this.addData('randomize', this.randomize);
+        
+        this.setInitialResponse('');
     }
 
     getSelectorForKey(key) {
         const selectorMap = {
             root: '',
+            innerContainer: `#${this.id}-inner-container`,
             label: '.question-label',
             subText: '.question-subtext',
             optionsContainer: '.options-container',
@@ -70,15 +84,14 @@ class SingleSelect extends Element {
             </div>
         `).join('');
 
-        const styleString = this.generateStylesheet();
-
         return `
-            <style>${styleString}</style>
             <div class="single-select-question" id="${this.id}-container">
-                <label class="question-label">${this.text}</label>
-                ${this.subText ? `<span class="question-subtext">${this.subText}</span>` : ''}
-                <div class="options-container">
-                    ${optionsString}
+                <div id="${this.id}-inner-container">
+                    <label class="question-label" for="${this.id}-0">${this.text}</label>
+                    ${this.subText ? `<span class="question-subtext">${this.subText}</span>` : ''}
+                    <div class="options-container">
+                        ${optionsString}
+                    </div>
                 </div>
                 <div id="${this.id}-error" class="error-message" style="display: none;"></div>
             </div>
@@ -95,22 +108,26 @@ class SingleSelect extends Element {
 
     attachEventListeners() {
         const container = document.getElementById(`${this.id}-container`);
-        container.addEventListener('change', (e) => {
-            if (e.target.type === 'radio') {
-                this.setResponse(e.target.value);
-            }
-        });
+        this.addEventListenerWithTracking(container, 'change', this.handleChange.bind(this));
+    }
+
+    handleChange(e) {
+        if (e.target.type === 'radio') {
+            this.setResponse(e.target.value);
+        }
     }
 
     setResponse(value) {
-        super.setResponse(value, true);
+        super.setResponse(value, value !== '');
         this.showValidationError('');
     }
 
     validate(showError = false) {
-        const isValid = !this.required || !!this.data.response;
+        const isValid = !this.required || (this.data.response && this.data.response !== '');
         if (showError && !isValid) {
             this.showValidationError('Please select an option.');
+        } else {
+            this.showValidationError('');
         }
         return isValid;
     }

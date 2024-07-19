@@ -1,13 +1,13 @@
 import Element from '../core/element.js';
 
 class NumberEntry extends Element {
-    static styleKeys = ['root', 'label', 'subText', 'input', 'unit', 'errorMessage'];
+    static styleKeys = ['root', 'innerContainer','label', 'subText', 'input', 'unit', 'errorMessage'];
 
     static defaultStyles = {
         root: { 
             marginBottom: '20px',
-            borderRadius: '5px'
         },
+        innerContainer: { },
         label: { 
             display: 'block',
             marginBottom: '5px',
@@ -31,7 +31,11 @@ class NumberEntry extends Element {
             marginLeft: '5px',
             fontSize: '0.9em',
         },
-        errorMessage: {}
+        errorMessage: {
+            marginTop: '5px',
+            color: '#fa5252',
+            fontSize: '0.9em',
+        }
     };
 
     constructor({ id, text, subText = '', min = null, max = null, step = 1, unit = '', required = true, styles = {} }) {
@@ -42,19 +46,20 @@ class NumberEntry extends Element {
         this.max = max;
         this.step = step;
         this.unit = unit;
-        this.styles = this.mergeStyles(NumberEntry.defaultStyles, styles);
+        this.mergeStyles(NumberEntry.defaultStyles, styles);
         this.addData('text', text);
         this.addData('subText', subText);
         this.addData('min', min);
         this.addData('max', max);
         this.addData('step', step);
         this.addData('unit', unit);
-        this.setResponse('');
+        this.setInitialResponse('');
     }
 
     getSelectorForKey(key) {
         const selectorMap = {
             root: '',
+            innerContainer: `#${this.id}-inner-container`,
             label: 'label',
             subText: '.question-subtext',
             input: 'input[type="number"]',
@@ -65,26 +70,26 @@ class NumberEntry extends Element {
     }
 
     generateHTML() {
-        const styleString = this.generateStylesheet();
         const minAttr = this.min !== null ? `min="${this.min}"` : '';
         const maxAttr = this.max !== null ? `max="${this.max}"` : '';
 
         return `
-            <style>${styleString}</style>
             <div class="number-entry-question" id="${this.id}-container">
-                <label for="${this.id}">${this.text}</label>
-                ${this.subText ? `<span class="question-subtext">${this.subText}</span>` : ''}
-                <div>
-                    <input 
-                        type="number" 
-                        id="${this.id}" 
-                        name="${this.id}" 
-                        ${minAttr}
-                        ${maxAttr}
-                        step="${this.step}"
-                        ${this.required ? 'required' : ''}
-                    >
-                    ${this.unit ? `<span class="unit-label">${this.unit}</span>` : ''}
+                <div id="${this.id}-inner-container">
+                    <label for="${this.id}">${this.text}</label>
+                    ${this.subText ? `<span class="question-subtext">${this.subText}</span>` : ''}
+                    <div>
+                        <input 
+                            type="number" 
+                            id="${this.id}" 
+                            name="${this.id}" 
+                            ${minAttr}
+                            ${maxAttr}
+                            step="${this.step}"
+                            ${this.required ? 'required' : ''}
+                        >
+                        ${this.unit ? `<span class="unit-label">${this.unit}</span>` : ''}
+                    </div>
                 </div>
                 <div id="${this.id}-error" class="error-message" style="display: none;"></div>
             </div>

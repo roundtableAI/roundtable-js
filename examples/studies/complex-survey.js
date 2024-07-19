@@ -1,10 +1,10 @@
-import Survey from '../core/survey.js';
-import OpenEnd from '../question_types/openEnd.js';
-import SingleSelect from '../question_types/singleSelect.js';
-import Grid from '../question_types/grid.js';
-import MultiSelect from '../question_types/multiSelect.js';
-import CheckBox from '../question_types/checkBox.js';
-import NumberEntry from '../question_types/numberEntry.js';
+import Survey from '../../library/core/survey.js';
+import OpenEnd from '../../library/elements/openEnd.js';
+import Grid from '../../library/elements/grid.js';
+import MultiSelect from '../../library/elements/multiSelect.js';
+import SingleSelect from '../../library/elements/singleSelect.js';
+import CheckBox from '../../library/elements/checkBox.js';
+import NumberEntry from '../../library/elements/numberEntry.js';
 
 // Survey pages
 async function addPage1(survey) {
@@ -23,7 +23,13 @@ async function addPage1(survey) {
     const q1 = new SingleSelect({
         id: 'q1',
         text: 'Which of these animals do you like best?',
-        options: ['Cat', 'Dog', 'Hamster']
+        options: ['Cat', 'Dog', 'Hamster'],
+        styles: {
+            label:{
+                // Make in a different font
+                fontFamily: 'monospace',
+            }
+        }
     });
     await survey.showPage({ id: 'page1', elements: [consent, age, q1] });
 }
@@ -107,7 +113,11 @@ async function runSurvey() {
             },
             button: {
                 color: 'blue',
-                background: 'yellow',
+                background: 'orange',
+                color: 'white',
+                '&:hover': {
+                    background: 'red',
+                },
             },
         }
     });
@@ -118,11 +128,7 @@ async function runSurvey() {
     if (survey.getResponse('q1') === 'Cat') {
         await addPage4(survey);
     }
-    survey.finishSurvey({ message: 'Thank you for completing the survey!' });
+    survey.finishSurvey('Thank you for completing the survey!');
 }
 
 runSurvey();
-
-// survey.js -- reactive elements/questions that pop up right under the question that was just answered
-// Example that does some interesting things...
-// 

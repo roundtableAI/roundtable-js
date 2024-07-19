@@ -1,5 +1,5 @@
 class Survey {
-    static styleKeys = ['body', 'container', 'question', 'button', 'errorMessage', 'nextButtonError'];
+    static styleKeys = ['body', 'container', 'question', 'navigation', 'button', 'errorMessage', 'nextButtonError', 'finishMessage'];
 
     static defaultStyles = {
         body: {
@@ -10,7 +10,7 @@ class Survey {
             padding: '25px',
             '@media (max-width: 650px)': {
                 background: 'white',
-                padding: '20px',
+                padding: '0px',
             },
         },
         container: {
@@ -29,7 +29,10 @@ class Survey {
             },
         },
         question: {
-            marginBottom: '20px',
+            marginBottom: '30px',
+        },
+        navigation: {
+            marginTop: '45px',
         },
         button: {
             backgroundColor: '#333',
@@ -56,13 +59,24 @@ class Survey {
             marginLeft: '10px',
             display: 'inline-block',
             fontSize: '0.9em',
-        }
+        },
+        finishMessage: {
+            display: 'none',
+            fontSize: '1.1em',
+            fontWeight: 'bold',
+            textAlign: 'center',
+        },
     };
+
 
     constructor(customSurveyDetails = {}) {
         this.responses = [];
         this.currentPage = null;
         this.nextButtonListener = null;
+        this.plugins = [];
+        this.currentPageElements = [];
+        this.nextButtonListener = null;
+
 
         this.surveyDetails = {
             startTime: new Date().toISOString(),
@@ -71,25 +85,20 @@ class Survey {
 
         this.globalStyles = this.mergeStyles(Survey.defaultStyles, this.surveyDetails.styles || {});
 
-        // Check if the DOM is already loaded
         if (document.readyState === 'loading') {
-            // If not, wait for it to load
             document.addEventListener('DOMContentLoaded', () => this.initialize());
         } else {
-            // If it's already loaded, initialize immediately
             this.initialize();
         }
     }
 
     initialize() {
-        this.validateStyles();
-        this.applyGlobalStyles();
-        this.revealContent();
-
-        // Any other initialization code can go here
-        // For example, loading the first page of the survey
-        if (this.surveyDetails.pages && this.surveyDetails.pages.length > 0) {
-            this.showPage(this.surveyDetails.pages[0]);
+        try {
+            this.validateStyles();
+            this.applyGlobalStyles();
+            this.revealContent();
+        } catch (error) {
+            console.error('Error during survey initialization:', error);
         }
     }
 
@@ -103,6 +112,8 @@ class Survey {
         const surveyContainer = document.getElementById('survey-container');
         if (surveyContainer) {
             surveyContainer.classList.remove('hidden');
+        } else {
+            console.warn('Survey container not found');
         }
     }
 
@@ -119,7 +130,7 @@ class Survey {
         return Object.entries(source).reduce((merged, [key, value]) => {
             merged[key] = (key.startsWith('&') || key.startsWith('@media'))
                 ? this.deepMerge(target[key] || {}, value)
-                : this.deepMerge(target[key], value);
+                : value;
             return merged;
         }, { ...target });
     }
@@ -137,7 +148,9 @@ class Survey {
             question: '#question-container > div',
             button: '#next-button',
             errorMessage: '.error-message',
-            nextButtonError: '#next-button-error'
+            nextButtonError: '#next-button-error',
+            navigation: '#navigation',
+            finishMessage: '#finish',
         };
         return selectorMap[key] || '';
     }
@@ -178,6 +191,15 @@ class Survey {
         });
     }
 
+    addPlugin(plugin) {
+        if (typeof plugin.initialize === 'function') {
+            this.plugins.push(plugin);
+            plugin.initialize(this);
+        } else {
+            console.warn('Invalid plugin: missing initialize method');
+        }
+    }
+
     setSurveyDetail(key, value) {
         this.surveyDetails[key] = value;
     }
@@ -187,42 +209,89 @@ class Survey {
     }
 
     async showPage(page) {
-        this.currentPage = page;
+        try {
+            // Clean up elements from the previous page
+            this.cleanupCurrentPage();
 
-        const pageContainer = document.getElementById('page-container');
-        if (pageContainer) {
+            this.currentPage = page;
+
+            for (const plugin of this.plugins) {
+                await plugin.beforePageRender(page);
+            }
+
+            const pageContainer = document.getElementById('page-container');
+            if (!pageContainer) throw new Error('Page container not found');
+
             pageContainer.innerHTML = '';
             const questionContainer = document.createElement('div');
             questionContainer.id = 'question-container';
             pageContainer.appendChild(questionContainer);
 
+            // Render new elements and keep track of them
+            this.currentPageElements = [];
             for (const element of page.elements) {
                 await element.render(questionContainer);
+                this.currentPageElements.push(element);
             }
+
+            await this.setupNextButton();
+
+            for (const plugin of this.plugins) {
+                await plugin.afterPageRender(page);
+            }
+        } catch (error) {
+            console.error('Error showing page:', error);
+        }
+    }
+
+    cleanupCurrentPage() {
+        if (this.currentPageElements && this.currentPageElements.length > 0) {
+            for (const element of this.currentPageElements) {
+                if (typeof element.destroy === 'function') {
+                    element.destroy();
+                } else {
+                    console.warn(`Element ${element.id} does not have a destroy method`);
+                }
+            }
+            this.currentPageElements = [];
+        }
+
+        // Clean up the next button listener
+        const nextButton = document.getElementById('next-button');
+        if (nextButton && this.nextButtonListener) {
+            nextButton.removeEventListener('click', this.nextButtonListener);
+            this.nextButtonListener = null;
+        }
+    }
+
+    async setupNextButton() {
+        const nextButton = document.getElementById('next-button');
+        if (!nextButton) throw new Error('Next button not found');
+
+        const nextButtonError = document.createElement('span');
+        nextButtonError.id = 'next-button-error';
+        nextButtonError.className = 'next-button-error';
+        nextButtonError.style.display = 'none';
+        nextButton.parentNode.insertBefore(nextButtonError, nextButton.nextSibling);
+
+        if (this.nextButtonListener) {
+            nextButton.removeEventListener('click', this.nextButtonListener);
         }
 
         return new Promise(resolve => {
-            const nextButton = document.getElementById('next-button');
-            const nextButtonError = document.createElement('span');
-            nextButtonError.id = 'next-button-error';
-            nextButtonError.className = 'next-button-error';
-            nextButtonError.style.display = 'none'; // Initially hide the error message
-            nextButton.parentNode.insertBefore(nextButtonError, nextButton.nextSibling);
-
-            if (this.nextButtonListener) {
-                nextButton.removeEventListener('click', this.nextButtonListener);
-            }
-
             this.nextButtonListener = async () => {
-                if (await this.validateCurrentPage()) {
-                    this.collectPageData(page);
-                    nextButtonError.style.display = 'none';
-                    nextButtonError.textContent = '';
-                    resolve();
-                } else {
-                    nextButtonError.style.display = 'inline-block';
-                    nextButtonError.textContent = 'Please check your answers.';
-                    console.log("Validation failed. Please check your answers.");
+                try {
+                    if (await this.validateCurrentPage()) {
+                        this.collectPageData(this.currentPage);
+                        nextButtonError.style.display = 'none';
+                        nextButtonError.textContent = '';
+                        resolve();
+                    } else {
+                        nextButtonError.style.display = 'inline-block';
+                        nextButtonError.textContent = 'Please check your answers.';
+                    }
+                } catch (error) {
+                    console.error('Error in next button handler:', error);
                 }
             };
 
@@ -280,17 +349,48 @@ class Survey {
         };
     }
 
-    finishSurvey({ message }) {
-        document.getElementById('navigation')?.remove();
+    finishSurvey(message) {
+        try {
+            // Clean up elements from the last page
+            this.cleanupCurrentPage();
 
-        const pageContainer = document.getElementById('page-container');
-        if (pageContainer) {
-            pageContainer.innerHTML = message;
+            // Remove navigation elements
+            const navigation = document.getElementById('navigation');
+            if (navigation) navigation.remove();
+
+            for (const plugin of this.plugins) {
+                plugin.beforeSurveyFinish();
+            }
+
+            // Clear the page container
+            const pageContainer = document.getElementById('page-container');
+            if (pageContainer) {
+                pageContainer.innerHTML = '';
+            }
+
+            // Display the finish message
+            const finishElement = document.getElementById('finish') || document.createElement('div');
+            finishElement.id = 'finish';
+            finishElement.innerHTML = message;
+            finishElement.style.display = 'block';
+
+            // If the finish element doesn't exist in the DOM, append it
+            if (!document.getElementById('finish')) {
+                const surveyContainer = document.getElementById('survey-container');
+                if (surveyContainer) {
+                    surveyContainer.appendChild(finishElement);
+                } else {
+                    console.error('Survey container not found');
+                }
+            }
+
+            this.surveyDetails.endTime = new Date().toISOString();
+
+            console.log('Survey finished. Data stored.');
+            console.log("survey data:", this.getAllSurveyData());
+        } catch (error) {
+            console.error('Error finishing survey:', error);
         }
-
-        this.surveyDetails.endTime = new Date().toISOString();
-
-        console.log("Survey completed. Final data:", this.getAllSurveyData());
     }
 }
 
