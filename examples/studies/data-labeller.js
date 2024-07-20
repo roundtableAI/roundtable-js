@@ -4,7 +4,7 @@ import BoundingBox from '../../library/elements/boundingBox.js';
 import ProgressBar from '../../library/plugins/progressBar.js';
 
 // Add images and questions for each page
-const imageUrls = ['assets/images/dog.jpg', 'assets/images/cat.jpg'];
+const imageUrls = ['assets/dog.jpg', 'assets/cat.jpg'];
 
 async function addLabelingPage(survey, imageUrl, index) {
     const q1 = new SingleSelect({
