@@ -15,11 +15,8 @@ We believe that well-crafted surveys lead to better data, and better data leads 
   <a href="https://twitter.com/roundtableDOTai"><img src="https://img.shields.io/twitter/follow/roundtableDOTai?style=social" alt="Twitter Follow"></a>
   <!-- Hacker News -->
   <a href="https://news.ycombinator.com/item?id=36865625"><img src="https://img.shields.io/badge/Hacker%20News-121-%23FF6600" alt="Hacker News"></a>
-  <!-- Y Combinator -->
-  <a href="https://www.ycombinator.com"><img src="https://img.shields.io/badge/Backed%20by-Y%20Combinator-%23f26625" alt="Y Combinator"></a>
 </p>
 
-We get excited about open-source enterprise-grade programmatic survey software. Do you?
 
 **Surveys are a _craft_**. They are the gateways to new information. *How* you ask determines *what* you receive.
 
@@ -27,11 +24,11 @@ Whether you're conducting market research, gathering academic data, or measuring
 
 ## 🌟 Features
 
-- **Code-First**: Design surveys using JavaScript
-- **Plugins**: Easily add new question types and analysis tools
-- **Branching Logic**: Create complex, adaptive surveys
-- **Data Visualization**: Built-in tools to create beautiful, interactive charts
-- **Customization**: Extensive theming options with CSS and template overrides
+- **Designed for the Modern Web:** We’re designed in JavaScript and leverage its asynchronous functionality for managing survey logic. For example, rather than determining this logic based on callbacks that trigger when a page is submitted, our library builds the timeline in an async function which means the logic flows intuitively from top to bottom. 
+
+- **AI-Native Functionality:** Our cloud offering has AI-native features such as natural language programming and automated fraud detection. We’re continuously expanding our AI features. Let us know what tools you’d like to see!
+
+- **Developer-Friendly:** We are open-source and API-first. This problem arose by seeing how difficult it was to integrate our API into other survey softwares. We want the open-source offering to include a robust plugin ecosystem where people can introduce new question types, integrate with tools like CRMs, and control how data is stored and processed. 
 
 ## 🚀 Quick Start
 
@@ -42,10 +39,6 @@ Whether you're conducting market research, gathering academic data, or measuring
 1. Install Roundtable.js using npm:
    ```
    npm install roundtable-js@beta
-   ```
-2. Or if you prefer using yarn:
-   ```
-   yarn add roundtable-js
    ```
 
 ### Option 2: Git
@@ -67,61 +60,65 @@ Whether you're conducting market research, gathering academic data, or measuring
 1. Import the necessary modules in your JavaScript file:
 
    ```javascript
-   import Survey from './core/survey.mjs';
-   import Page from './core/page.mjs';
-   import MultipleSelect from './question_types/multipleSelect.mjs';
+   import Survey from 'roundtable-js/core/survey.js';
+   import SingleSelect from 'roundtable-js/question_types/singleSelect.js';
    ```
 
 2. Create a survey instance and add pages with questions:
 
    ```javascript
-   const survey = new Survey('my-survey', 'My Survey');
+   // Define an asynchronous function to run the survey
+   async function runSurvey() {
 
-   const page = new Page('page1');
-   page.addElement(new MultipleSelect('q1', 'What is your favorite animal?', ['Cat', 'Dog', 'Hamster']));
-   survey.addPage(page);
+         // Create a new Survey instance with a specific participant ID
+         const survey = new Survey({ participantId: 'participant_123' });
+
+         // Define the first question as a single-select question with two options
+         const question1 = new SingleSelect({
+            id: 'question1',
+            text: 'A question',
+            options: ['Option 1', 'Option 2'],
+         });
+
+         // Define the second question as a single-select question with two options
+         const question2 = new SingleSelect({
+            id: 'question2',
+            text: 'A second question',
+            options: ['Option 1', 'Option 2'],
+         });
+         
+         // Show the first page with the first question and wait for it to be answered
+         await survey.showPage({ id: 'page1', elements: [question1] });
+         
+         // This code runs only after the first page is completed
+         console.log('Page 1 completed');
+         
+         // Show the next page with the second question and wait for it to be answered
+         await survey.showPage({ id: 'page2', elements: [question2] });
+         
+         // Finish the survey once all pages are completed
+         survey.finishSurvey();
+      }
+
+      // Start the survey by calling the runSurvey function
+      runSurvey();
    ```
 
 3. Set up your HTML:
 
    ```html
-   <div id="survey-container">
-     <div id="progress"></div>
-     <form id="survey-form">
-       <div id="question-container"></div>
-       <button type="submit" id="submit-button">Next</button>
-     </form>
-   </div>
-   ```
-
-4. Render the survey and handle navigation:
-
-   ```javascript
-   document.addEventListener('DOMContentLoaded', () => {
-     renderSurvey();
-
-     document.getElementById('survey-form').addEventListener('submit', (event) => {
-       event.preventDefault();
-       const formData = new FormData(event.target);
-       const data = Object.fromEntries(formData.entries());
-       survey.submitData(data);
-       if (!survey.isComplete()) {
-         renderSurvey();
-       } else {
-         survey.endSurvey();
-       }
-     });
-   });
-
-   function renderSurvey() {
-     survey.render();
-     updateNavButtons();
-   }
-
-   function updateNavButtons() {
-     const submitButton = document.getElementById('submit-button');
-     submitButton.textContent = survey.isComplete() ? 'Finish' : 'Next';
-   }
+   <!DOCTYPE html>
+   <html lang="en">
+   <head>
+         <meta charset="UTF-8">
+         <meta name="viewport" content="width=device-width, initial-scale=1.0">
+         <title>RoundtableJS Survey</title>
+   </head>
+   <body>
+         <div id="survey-container"></div>
+         <script type="module" src="your-survey-script.js"></script>
+   </body>
+   </html>
    ```
 
 ## 📚 Documentation
@@ -129,19 +126,6 @@ Whether you're conducting market research, gathering academic data, or measuring
 Read our [full documentation](https://docs.roundtable.ai).
 
 ## 🛠️ Development / Open-Source Community
-
-<p align="center">
-  <!-- Build Status -->
-  <a href="https://github.com/roundtableAI/roundtable-js/actions"><img src="https://img.shields.io/github/actions/workflow/status/roundtableAI/roundtable-js/main.yml" alt="Build Status"></a>
-  <!-- Code Coverage -->
-  <a href="https://codecov.io/gh/roundtableAI/roundtable-js"><img src="https://codecov.io/gh/roundtableAI/roundtable-js/branch/main/graph/badge.svg" alt="Code Coverage"></a>
-  <!-- Maintainability -->
-  <a href="https://codeclimate.com/github/roundtableAI/roundtable-js/maintainability"><img src="https://api.codeclimate.com/v1/badges/your_badge_id/maintainability" alt="Maintainability"></a>
-  <!-- Dependencies -->
-  <a href="https://david-dm.org/roundtableAI/roundtable-js"><img src="https://img.shields.io/david/roundtableAI/roundtable-js" alt="Dependencies"></a>
-  <!-- Open Source Love -->
-  <a href="https://github.com/roundtableAI/roundtable-js"><img src="https://badges.frapsoft.com/os/v1/open-source.svg?v=103" alt="Open Source Love"></a>
-</p>
 
 Please see our [Contributing Guide](CONTRIBUTING.md).
 
@@ -158,5 +142,3 @@ Join our community:
 - [LinkedIn](https://www.linkedin.com/company/roundtableAI)
 
 ---
-
-Thank you for choosing Roundtable for your survey needs. Engage with our community, contribute to the project, and let's build something great together. 📊✨

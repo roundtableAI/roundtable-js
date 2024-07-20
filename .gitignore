@@ -1,0 +1,6 @@
+dist/
+node_modules/
+.DS_STORE
+.DS_Store
+**/.DS_Store
+.gitignore
