@@ -5,9 +5,17 @@ import MultiSelect from '../../library/elements/multiSelect.js';
 import SingleSelect from '../../library/elements/singleSelect.js';
 import CheckBox from '../../library/elements/checkBox.js';
 import NumberEntry from '../../library/elements/numberEntry.js';
+import OrderedScale from '../../library/elements/orderedScale.js';
 
 // Survey pages
 async function addPage1(survey) {
+
+    const os = new OrderedScale({
+        id: 'os',
+        text: 'Please rate the following animals in order of preference',
+        // labels: ['Strongly disagree', '', '', '', '','','Strongly agree'],
+    });
+
     const consent = new CheckBox({
         id: 'consent',
         text: 'I consent to participate in this survey',
@@ -31,7 +39,7 @@ async function addPage1(survey) {
             }
         }
     });
-    await survey.showPage({ id: 'page1', elements: [consent, age, q1] });
+    await survey.showPage({ id: 'page1', elements: [os,consent, age, q1] });
 }
 
 async function addPage2(survey) {

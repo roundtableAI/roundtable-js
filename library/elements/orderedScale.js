@@ -4,12 +4,12 @@ class OrderedScale extends Element {
     static styleKeys = ['root', 'innerContainer', 'label', 'subText', 'scaleContainer', 'scaleItem', 'scaleLabel', 'scaleInput', 'scaleNumber', 'errorMessage'];
 
     static defaultStyles = {
-        root: { 
+        root: {
             marginBottom: '20px',
             borderRadius: '5px'
         },
         innerContainer: {},
-        label: { 
+        label: {
             display: 'block',
             marginBottom: '5px',
             fontWeight: 'bold',
@@ -58,18 +58,18 @@ class OrderedScale extends Element {
         }
     };
 
-    constructor({ 
-        id, 
-        text, 
-        subText = '', 
-        required = true, 
-        min = 1, 
-        max = 7, 
-        labels = [], 
-        styles = {} 
+    constructor({
+        id,
+        text,
+        subText = '',
+        required = true,
+        min = 1,
+        max = 7,
+        labels = [],
+        styles = {}
     }) {
         super({ id, type: 'ordered-scale', store_data: true, required });
-        
+
         if (min >= max) {
             throw new Error('Min value must be less than max value');
         }
@@ -82,15 +82,15 @@ class OrderedScale extends Element {
         this.min = min;
         this.max = max;
         this.labels = labels;
-        
+        if (labels.length === 0) {
+            this.constructor.defaultStyles.scaleLabel.height = 'auto';
+        }
         this.mergeStyles(OrderedScale.defaultStyles, styles);
-        
         this.addData('text', text);
         this.addData('subText', subText);
         this.addData('min', min);
         this.addData('max', max);
         this.addData('labels', labels);
-        
         this.setInitialResponse(null);
     }
 
@@ -132,7 +132,7 @@ class OrderedScale extends Element {
                         ${scaleItems.join('')}
                     </div>
                 </div>
-                <div id="${this.id}-error" class="error-message" style="display: block;">Hi there</div>
+                <div id="${this.id}-error" class="error-message" style="display: none;"></div>
             </div>
         `;
     }
