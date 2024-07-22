@@ -5,6 +5,7 @@ import MultiSelect from '../../library/elements/multiSelect.js';
 import SingleSelect from '../../library/elements/singleSelect.js';
 import CheckBox from '../../library/elements/checkBox.js';
 import NumberEntry from '../../library/elements/numberEntry.js';
+import TextInput from '../../library/elements/textInput.js';
 
 // Survey pages
 async function addPage1(survey) {
@@ -20,6 +21,11 @@ async function addPage1(survey) {
         min: 18,
         max: 100,
     });
+    const name = new TextInput({
+        id: 'name',
+        text: 'What is your name?',
+        subText: 'Please enter your full name, first and last',
+    });
     const q1 = new SingleSelect({
         id: 'q1',
         text: 'Which of these animals do you like best?',
@@ -31,19 +37,14 @@ async function addPage1(survey) {
             }
         }
     });
-    await survey.showPage({ id: 'page1', elements: [consent, age, q1] });
+    await survey.showPage({ id: 'page1', elements: [consent, age, name, q1] });
 }
 
 async function addPage2(survey) {
     const q2_1 = new SingleSelect({
         id: 'q2_1',
         text: `Why do you like ${survey.getResponse('q1')}s?`,
-        options: ['They are cute', 'They are friendly', 'They are low maintenance'],
-        styles:{
-            root: {
-                backgroundColor: 'lightgreen',
-            },
-        }
+        options: ['They are cute', 'They are friendly', 'They are low maintenance']
     });
 
     const q2_2 = new OpenEnd({
@@ -53,13 +54,6 @@ async function addPage2(survey) {
         maxLength: 200,
         rows: 100,
         cols: 10,
-        styles: {
-            background: 'pink', // For the entire question element
-            textArea: {
-                backgroundColor: 'lightblue',
-            }
-
-        }
     });
     await survey.showPage(({ id: 'page2', elements: [q2_1, q2_2] }));
 }
@@ -108,9 +102,6 @@ async function runSurvey() {
         participantId: 'participant_123',
         condition: 'test',
         styles: {
-            body:{
-                background: 'pink',
-            },
             button: {
                 color: 'blue',
                 background: 'orange',
