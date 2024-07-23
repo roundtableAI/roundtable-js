@@ -12,7 +12,7 @@ We believe that well-crafted surveys lead to better data, and better data leads 
   <!-- NPM Downloads -->
   <a href="https://www.npmjs.com/package/roundtable-js"><img src="https://img.shields.io/npm/dm/roundtable-js" alt="NPM Downloads"></a>
   <!-- Twitter Follow -->
-  <a href="https://twitter.com/roundtableDOTai"><img src="https://img.shields.io/twitter/follow/roundtableDOTai?style=social" alt="Twitter Follow"></a>
+  <a href="https://twitter.com/roundtabledotai"><img src="https://img.shields.io/twitter/follow/roundtabledotai?style=social" alt="Twitter Follow"></a>
   <!-- Hacker News -->
   <a href="https://news.ycombinator.com/item?id=36865625"><img src="https://img.shields.io/badge/Hacker%20News-121-%23FF6600" alt="Hacker News"></a>
 </p>
@@ -137,7 +137,7 @@ Roundtable is open source software [licensed](LICENSE).
 
 Join our community:
 - [Slack](https://join.slack.com/t/roundtablejs/shared_invite/zt-2m09n74yv-B~UeGbxSzGMTO3f0qXhRxQ)
-- [Twitter](https://twitter.com/roundtableDOTai)
+- [Twitter](https://twitter.com/roundtabledotai)
 - [Blog](https://roundtable.ai/blog)
 - [LinkedIn](https://www.linkedin.com/company/roundtableAI)
 
