@@ -63,19 +63,18 @@ class OpenEnd extends Element {
         this.rows = rows;
         this.placeholder = placeholder;
         this.includeAlias = Boolean(includeAlias);
-
         this.mergeStyles(OpenEnd.defaultStyles, styles);
-
         this.aliasMaxLength = 10000;
         this.aliasTypingHistory = [];
         this.aliasStartTime = null;
         this.aliasTextOverLength = false;
-
         this.addData('text', text);
         this.addData('subText', subText);
         this.addData('minLength', minLength);
         this.addData('maxLength', maxLength);
         this.addData('includeAlias', this.includeAlias);
+        this.addData('aliasMaxLength', this.aliasMaxLength);
+        this.addData('aliasTypingHistory', this.aliasTypingHistory);
         this.setInitialResponse('');
     }
 
