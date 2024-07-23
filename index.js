@@ -1,21 +1,27 @@
 // src/index.js
 
-import Survey from './core/survey.js';
-import CheckBox from './question_types/checkBox.js';
-import Grid from './question_types/grid.js';
-import HTML from './question_types/html.js';
-import MultiSelect from './question_types/multiSelect.js';
-import NumberEntry from './question_types/numberEntry.js';
-import OpenEnd from './question_types/openEnd.js';
-import SingleSelect from './question_types/singleSelect.js';
+import Survey from './library/core/survey.js';
+import BoundingBox from './library/elements/boundingBox.js';
+import CheckBox from './library/elements/checkBox.js';
+import Grid from './library/elements/grid.js';
+import HTML from './library/elements/html.js';
+import MultiSelect from './library/elements/multiSelect.js';
+import NumberEntry from './library/elements/numberEntry.js';
+import OrderedScale from './library/elements/orderedScale.js';
+import OpenEnd from './library/elements/openEnd.js';
+import SingleSelect from './library/elements/singleSelect.js';
+import ProgressBar from './library/plugins/progressBar.js';
 
 export {
     Survey,
+    BoundingBox,
     CheckBox,
     Grid,
     HTML,
     MultiSelect,
     NumberEntry,
+    OrderedScale,
     OpenEnd,
-    SingleSelect
+    SingleSelect,
+    ProgressBar
 };
