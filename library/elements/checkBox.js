@@ -30,7 +30,7 @@ class CheckBox extends Element {
         }
     };
 
-    constructor({ id, text, required = false, styles = {} }) {
+    constructor({ id, text, required = true, styles = {} }) {
         super({ id, type: 'checkbox', store_data: true, required });
         this.text = text;
         this.mergeStyles(CheckBox.defaultStyles, styles);
