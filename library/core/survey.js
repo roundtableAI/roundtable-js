@@ -386,8 +386,6 @@ class Survey {
 
             this.surveyDetails.endTime = new Date().toISOString();
 
-            console.log('Survey finished. Data stored.');
-            console.log("survey data:", this.getAllSurveyData());
         } catch (error) {
             console.error('Error finishing survey:', error);
         }
