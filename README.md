@@ -37,7 +37,7 @@ Whether you're conducting market research, gathering academic data, or measuring
 
 - **Developer-Friendly:** We are open-source and API-first. This problem arose by seeing how difficult it was to integrate our API into other survey softwares. We want the open-source offering to include a robust plugin ecosystem where people can introduce new question types, integrate with tools like CRMs, and control how data is stored and processed. 
 
-- **AI-Native Functionality:** Our [cloud offering](surveys.roundtable.ai) has AI-native features such as natural language programming and automated fraud detection. We’re continuously expanding our AI features. Let us know what tools you’d like to see!
+- **AI-Native Functionality:** Our [cloud offering](https://surveys.roundtable.ai) has AI-native features such as natural language programming and automated fraud detection. We’re continuously expanding our AI features. Let us know what tools you’d like to see!
 
 
 ## 🚀 Quick Start
@@ -121,8 +121,8 @@ Whether you're conducting market research, gathering academic data, or measuring
       // Show the next page with the second question and wait for it to be answered
       await survey.showPage({ id: 'page2', elements: [question2] });
 
-      // Finish the survey once all pages are completed
-      survey.finishSurvey();
+      // Finish the survey once all pages are completed and display an end message
+      survey.finishSurvey('Thank you for completing the survey!');
    }
 
    // Start the survey by calling the runSurvey function
