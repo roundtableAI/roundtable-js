@@ -5,130 +5,150 @@ import MultiSelect from '../../library/elements/multiSelect.js';
 import SingleSelect from '../../library/elements/singleSelect.js';
 import CheckBox from '../../library/elements/checkBox.js';
 import NumberEntry from '../../library/elements/numberEntry.js';
+import ProgressBar from '../../library/plugins/progressBar.js';
 
-// Survey pages
+// Initial page
 async function addPage1(survey) {
     const consent = new CheckBox({
         id: 'consent',
         text: 'I consent to participate in this survey',
-        required: true,
+        styles: {
+            // Horizontally the checkbox question
+            innerContainer:{
+                margin: '0 auto',
+                width: 'fit-content',
+            },
+        }
     });
     const age = new NumberEntry({
         id: 'age',
         text: 'How old are you?',
-        required: true,
         min: 18,
         max: 100,
     });
-    const q1 = new SingleSelect({
-        id: 'q1',
+    const favorite_animal = new SingleSelect({
+        id: 'favorite_animal',
         text: 'Which of these animals do you like best?',
-        options: ['Cat', 'Dog', 'Hamster'],
-        styles: {
-            label:{
-                // Make in a different font
-                fontFamily: 'monospace',
-            }
-        }
+        options: ['Cat', 'Dog', 'Hamster']
     });
-    await survey.showPage({ id: 'page1', elements: [consent, age, q1] });
+    await survey.showPage({ id: 'page1', elements: [consent,age,favorite_animal] });
 }
 
+// Second page
 async function addPage2(survey) {
-    const q2_1 = new SingleSelect({
-        id: 'q2_1',
-        text: `Why do you like ${survey.getResponse('q1')}s?`,
-        options: ['They are cute', 'They are friendly', 'They are low maintenance'],
-        styles:{
-            root: {
-                backgroundColor: 'lightgreen',
-            },
-        }
+    const why_like = new SingleSelect({
+        id: 'why_like',
+        text: `Why do you like ${survey.getResponse('favorite_animal')}s?`,
+        options: ['They are cute', 'They are friendly', 'They are low maintenance']
     });
 
-    const q2_2 = new OpenEnd({
-        id: 'q2_2',
-        text: `Please describe your ideal ${survey.getResponse('q1')}`,
+    const ideal = new OpenEnd({
+        id: 'ideal',
+        text: `Please describe your ideal ${survey.getResponse('favorite_animal')}`,
         minLength: 10,
         maxLength: 200,
-        rows: 100,
-        cols: 10,
-        styles: {
-            background: 'pink', // For the entire question element
-            textArea: {
-                backgroundColor: 'lightblue',
-            }
-
-        }
+        rows: 20,
     });
-    await survey.showPage(({ id: 'page2', elements: [q2_1, q2_2] }));
+    await survey.showPage(({ id: 'page2', elements: [why_like, ideal] }));
 }
 
+// Third page
 async function addPage3(survey) {
-    const q3_1 = new MultiSelect({
-        id: 'q3_1',
+    const owned_pets = new MultiSelect({
+        id: 'owned_pets',
         text: 'Which of these animals do you have at home?',
         subText: 'Select all that apply',
         options: ['Cat', 'Dog', 'Hamster', 'Fish', 'Bird'],
     });
 
-    const q3_2 = new Grid({
-        id: 'q3_2',
+    const pet_satisfaction = new Grid({
+        id: 'pet_satisfaction',
         text: 'Please rate your satisfaction with the following pet attributes:',
         rows: ['Friendliness', 'Cleanliness', 'Maintenance'],
         columns: ['Very Satisfied', 'Satisfied', 'Neutral', 'Dissatisfied', 'Very Dissatisfied'],
     });
 
-    const q3_3 = new OpenEnd({
-        id: 'q3_3',
+    const dog_best = new OpenEnd({
+        id: 'dog_best',
         text: 'What is the best thing about having a dog?',
         minLength: 10,
         maxLength: 200,
     });
 
-    const elements = [q3_1, q3_2];
-    if (survey.getResponse('q1') === 'Dog') elements.push(q3_3);
+    const elements = [owned_pets, pet_satisfaction];
+    // Add the dog question only if the participant has a dog
+    if (survey.getResponse('favorite_animal') === 'Dog') elements.push(dog_best);
 
     await survey.showPage({ id: 'page3', elements });
 }
 
+// Fourth page
 async function addPage4(survey) {
-    const q4_1 = new OpenEnd({
-        id: 'q4_1',
+    const cat_best = new OpenEnd({
+        id: 'cat_best',
         text: 'What is the best thing about having a cat?',
         minLength: 10,
         maxLength: 200,
     });
 
-    await survey.showPage({ id: 'page4', elements: [q4_1] });
+    await survey.showPage({ id: 'page4', elements: [cat_best] });
 }
 
 async function runSurvey() {
     const survey = new Survey({
         participantId: 'participant_123',
-        condition: 'test',
+        // Randomly assign participants to test or control
+        condition: Math.random() > 0.5 ? 'test' : 'control',
+        // Custom styling for the entire survey
         styles: {
-            body:{
-                background: 'pink',
+            body: {
+                background: '#F1F1FB',
             },
-            button: {
-                color: 'blue',
-                background: 'orange',
-                color: 'white',
-                '&:hover': {
-                    background: 'red',
+            container: {
+                border: '1px solid black',
+                boxShadow: 'none',
+                // Small screens
+                '@media (max-width: 650px)': {
+                    border: 'none',
                 },
             },
+            button: {
+                background: '#5722dd',
+                // Hover
+                '&:hover': {
+                    background: '#7f57e5',
+                },
+            }
         }
     });
     // Survey pages
     await addPage1(survey);
+
+    // Add the progress bar after the first page
+    const progressBar = new ProgressBar({
+        maxPages: 3,
+        progressAsPercentage: true,
+        styles:{
+            bar:{
+                background: '#5722dd',
+            }
+        }
+
+    });
+    survey.addPlugin(progressBar);
+    
     await addPage2(survey);
     await addPage3(survey);
+    // Only add the fourth page if the participant likes cats
     if (survey.getResponse('q1') === 'Cat') {
         await addPage4(survey);
     }
-    survey.finishSurvey('Thank you for completing the survey!');
+    survey.finishSurvey(`
+        <h1>Thank you for completing the survey!</h1>
+        <br/>
+        <p>Your responses have been saved.</p>
+        <p>Visit our website at <a href="https://www.roudntable.ai">roundtable.ai</a> to learn more about our services.</p>
+        `);
 }
 
 runSurvey();

@@ -185,6 +185,3 @@ Join our community:
 - [LinkedIn](https://www.linkedin.com/company/roundtableAI)
 
 ---
-
-
-
