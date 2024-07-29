@@ -1,187 +1,154 @@
 import Survey from '../../library/core/survey.js';
 import OpenEnd from '../../library/elements/openEnd.js';
+import Grid from '../../library/elements/grid.js';
+import MultiSelect from '../../library/elements/multiSelect.js';
 import SingleSelect from '../../library/elements/singleSelect.js';
+import CheckBox from '../../library/elements/checkBox.js';
 import NumberEntry from '../../library/elements/numberEntry.js';
-import HTML from '../../library/elements/html.js';
+import ProgressBar from '../../library/plugins/progressBar.js';
 
+// Initial page
+async function addPage1(survey) {
+    const consent = new CheckBox({
+        id: 'consent',
+        text: 'I consent to participate in this survey',
+        styles: {
+            // Horizontally the checkbox question
+            innerContainer:{
+                margin: '0 auto',
+                width: 'fit-content',
+            },
+        }
+    });
+    const age = new NumberEntry({
+        id: 'age',
+        text: 'How old are you?',
+        min: 18,
+        max: 100,
+    });
+    const favorite_animal = new SingleSelect({
+        id: 'favorite_animal',
+        text: 'Which of these animals do you like best?',
+        options: ['Cat', 'Dog', 'Hamster']
+    });
+    await survey.showPage({ id: 'page1', elements: [consent,age,favorite_animal] });
+}
+
+// Second page
+async function addPage2(survey) {
+    const why_like = new SingleSelect({
+        id: 'why_like',
+        text: `Why do you like ${survey.getResponse('favorite_animal')}s?`,
+        options: ['They are cute', 'They are friendly', 'They are low maintenance']
+    });
+
+    const ideal = new OpenEnd({
+        id: 'ideal',
+        text: `Please describe your ideal ${survey.getResponse('favorite_animal')}`,
+        minLength: 10,
+        maxLength: 200,
+        rows: 20,
+    });
+    await survey.showPage(({ id: 'page2', elements: [why_like, ideal] }));
+}
+
+// Third page
+async function addPage3(survey) {
+    const owned_pets = new MultiSelect({
+        id: 'owned_pets',
+        text: 'Which of these animals do you have at home?',
+        subText: 'Select all that apply',
+        options: ['Cat', 'Dog', 'Hamster', 'Fish', 'Bird'],
+    });
+
+    const pet_satisfaction = new Grid({
+        id: 'pet_satisfaction',
+        text: 'Please rate your satisfaction with the following pet attributes:',
+        rows: ['Friendliness', 'Cleanliness', 'Maintenance'],
+        columns: ['Very Satisfied', 'Satisfied', 'Neutral', 'Dissatisfied', 'Very Dissatisfied'],
+    });
+
+    const dog_best = new OpenEnd({
+        id: 'dog_best',
+        text: 'What is the best thing about having a dog?',
+        minLength: 10,
+        maxLength: 200,
+    });
+
+    const elements = [owned_pets, pet_satisfaction];
+    // Add the dog question only if the participant has a dog
+    if (survey.getResponse('favorite_animal') === 'Dog') elements.push(dog_best);
+
+    await survey.showPage({ id: 'page3', elements });
+}
+
+// Fourth page
+async function addPage4(survey) {
+    const cat_best = new OpenEnd({
+        id: 'cat_best',
+        text: 'What is the best thing about having a cat?',
+        minLength: 10,
+        maxLength: 200,
+    });
+
+    await survey.showPage({ id: 'page4', elements: [cat_best] });
+}
 
 async function runSurvey() {
     const survey = new Survey({
-        condition: 'coca_cola_nps',
-        participant_id: 'p123',
+        participantId: 'participant_123',
+        // Randomly assign participants to test or control
+        condition: Math.random() > 0.5 ? 'test' : 'control',
+        // Custom styling for the entire survey
         styles: {
             body: {
-                backgroundColor: '#F40009',
-                color: '#FFFFFF',
-                fontFamily: 'Arial, sans-serif'
+                background: '#F1F1FB',
             },
             container: {
-                backgroundColor: '#FFFFFF',
-                color: '#000000',
-                borderRadius: '10px',
-                padding: '20px',
-                maxWidth: '600px',
-                margin: '20px auto',
-                boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)'
+                border: '1px solid black',
+                boxShadow: 'none',
+                // Small screens
+                '@media (max-width: 650px)': {
+                    border: 'none',
+                },
             },
             button: {
-                backgroundColor: '#F40009',
-                color: '#FFFFFF',
-                border: 'none',
-                padding: '12px 24px',
-                borderRadius: '5px',
-                cursor: 'pointer',
-                fontSize: '16px',
-                fontWeight: 'bold',
-                transition: 'background-color 0.3s ease',
+                background: '#5722dd',
+                // Hover
                 '&:hover': {
-                    backgroundColor: '#C5000B'
-                }
+                    background: '#7f57e5',
+                },
             }
         }
     });
+    // Survey pages
+    await addPage1(survey);
 
-    const logo = new HTML({
-        id: 'coca_cola_logo',
-        content: '<img src="https://www.coca-cola.com/content/dam/onexp/gt/en/home/asset-library/coca-cola-logo.png" alt="Coca-Cola Logo" style="max-width: 200px; margin: 0 auto 20px; display: block;">',
-    });
-
-    const welcome = new HTML({
-        id: 'welcome_message',
-        content: '<h2>Welcome to the Coca-Cola Customer Satisfaction Survey</h2><p>Your feedback is important to us. This short survey will take about 3-5 minutes to complete.</p>',
-        styles: {
-            root: {
-                textAlign: 'center',
-                marginBottom: '30px'
+    // Add the progress bar after the first page
+    const progressBar = new ProgressBar({
+        maxPages: 3,
+        progressAsPercentage: true,
+        styles:{
+            bar:{
+                background: '#5722dd',
             }
         }
-    });
 
-    const frequencyQuestion = new SingleSelect({
-        id: 'purchase_frequency',
-        text: 'How often do you purchase Coca-Cola products?',
-        options: [
-            'Daily',
-            'Several times a week',
-            'Once a week',
-            'A few times a month',
-            'Once a month',
-            'Less than once a month',
-            'Never'
-        ],
-        required: true,
-        styles: {
-            label: {
-                fontSize: '18px',
-                fontWeight: 'bold',
-                marginBottom: '15px',
-                color: '#F40009'
-            },
-            option: {
-                marginBottom: '12px',
-                fontSize: '16px'
-            },
-            radio: {
-                marginRight: '10px'
-            }
-        }
     });
-
-    const npsQuestion = new NumberEntry({
-        id: 'nps_score',
-        text: 'How likely are you to recommend Coca-Cola to a friend or colleague?',
-        subText: 'Please rate on a scale from 0 (Not at all likely) to 10 (Extremely likely)',
-        min: 0,
-        max: 10,
-        step: 1,
-        required: true,
-        styles: {
-            label: {
-                fontSize: '18px',
-                fontWeight: 'bold',
-                marginBottom: '10px',
-                color: '#F40009'
-            },
-            subText: {
-                fontSize: '14px',
-                marginBottom: '15px',
-                fontStyle: 'italic'
-            },
-            input: {
-                fontSize: '16px',
-                padding: '8px',
-                borderRadius: '5px',
-                border: '1px solid #ccc',
-                width: '60px'
-            }
-        }
-    });
-
-    const reasonQuestion = new OpenEnd({
-        id: 'nps_reason',
-        text: 'What is the primary reason for your score?',
-        required: true,
-        minLength: 10,
-        maxLength: 500,
-        rows: 4,
-        styles: {
-            label: {
-                fontSize: '18px',
-                fontWeight: 'bold',
-                marginBottom: '10px',
-                color: '#F40009'
-            },
-            textarea: {
-                fontSize: '16px',
-                padding: '8px',
-                borderRadius: '5px',
-                border: '1px solid #ccc',
-                width: '100%',
-                resize: 'vertical'
-            }
-        }
-    });
-
-    const improvementQuestion = new OpenEnd({
-        id: 'improvement_suggestion',
-        text: 'How can we improve your experience with Coca-Cola products?',
-        required: false,
-        minLength: 0,
-        maxLength: 500,
-        rows: 4,
-        styles: {
-            label: {
-                fontSize: '18px',
-                fontWeight: 'bold',
-                marginBottom: '10px',
-                color: '#F40009'
-            },
-            textarea: {
-                fontSize: '16px',
-                padding: '8px',
-                borderRadius: '5px',
-                border: '1px solid #ccc',
-                width: '100%',
-                resize: 'vertical'
-            }
-        }
-    });
-
-    const thankYou = new HTML({
-        id: 'thank_you_message',
-        content: '<h2>Thank you for your feedback!</h2><p>We appreciate your time and input. Your responses will help us improve our products and services.</p>',
-        styles: {
-            root: {
-                textAlign: 'center',
-                marginTop: '30px'
-            }
-        }
-    });
-
-    await survey.showPage({ id: 'page1', elements: [logo, welcome, frequencyQuestion] });
-    await survey.showPage({ id: 'page2', elements: [logo, npsQuestion, reasonQuestion] });
-    await survey.showPage({ id: 'page3', elements: [logo, improvementQuestion] });
-    survey.finishSurvey(thankYou.content);
+    survey.addPlugin(progressBar);
+    
+    await addPage2(survey);
+    await addPage3(survey);
+    // Only add the fourth page if the participant likes cats
+    if (survey.getResponse('q1') === 'Cat') {
+        await addPage4(survey);
+    }
+    survey.finishSurvey(`
+        <h1>Thank you for completing the survey!</h1>
+        <br/>
+        <p>Your responses have been saved.</p>
+        <p>Visit our website at <a href="https://www.roudntable.ai">roundtable.ai</a> to learn more about our services.</p>
+        `);
 }
 
 runSurvey();
