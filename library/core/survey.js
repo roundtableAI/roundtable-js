@@ -230,7 +230,7 @@ class Survey {
             // Render new elements and keep track of them
             this.currentPageElements = [];
             for (const element of page.elements) {
-                await element.render(questionContainer);
+                element.render();
                 this.currentPageElements.push(element);
             }
 

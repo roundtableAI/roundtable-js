@@ -18,6 +18,7 @@ class HTML extends Element {
 
         this.content = content;
         this.mergeStyles(HTML.defaultStyles, styles);
+        this.rendered = false;
     }
 
     getSelectorForKey(key) {
@@ -30,6 +31,30 @@ class HTML extends Element {
                 ${this.content}
             </div>
         `;
+    }
+
+    render() {
+        if (this.rendered) {
+            // If already rendered, update the content instead of recreating
+            const container = document.getElementById(`${this.id}-container`);
+            if (container) {
+                container.innerHTML = this.content;
+                return;
+            }
+        }
+
+        // If not rendered or container not found, render as usual
+        super.render();
+        this.rendered = true;
+    }
+
+    destroy() {
+        // Only remove from DOM, don't clear all data
+        const container = document.getElementById(`${this.id}-container`);
+        if (container) {
+            container.remove();
+        }
+        this.rendered = false;
     }
 
     attachEventListeners() {
