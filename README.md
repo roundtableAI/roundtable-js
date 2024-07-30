@@ -70,7 +70,7 @@ Whether you're conducting market research, gathering academic data, or measuring
 1. Include the following script tag in your HTML:
 
    ```html
-   <script src="https://cdn.jsdelivr.net/npm/roundtable-js@0.1.0/dist/bundle.js"></script>
+   <script src="https://cdn.jsdelivr.net/npm/roundtable-js@0.1.1/dist/bundle.js"></script>
    ```
 
 ## Usage
