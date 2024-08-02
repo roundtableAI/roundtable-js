@@ -127,12 +127,32 @@ class Survey {
         if (!source || typeof source !== 'object') return target;
         if (!target || typeof target !== 'object') return source;
 
-        return Object.entries(source).reduce((merged, [key, value]) => {
-            merged[key] = (key.startsWith('&') || key.startsWith('@media'))
-                ? this.deepMerge(target[key] || {}, value)
-                : value;
-            return merged;
-        }, { ...target });
+        const merged = { ...target };
+
+        // First pass: merge primary properties
+        Object.entries(source).forEach(([key, value]) => {
+            if (!(key.startsWith('&') || key.startsWith('@media'))) {
+                merged[key] = value;
+            }
+        });
+
+        // Second pass: handle special keys and ensure inherited properties
+        Object.entries(source).forEach(([key, value]) => {
+            if (key.startsWith('&') || key.startsWith('@media')) {
+                merged[key] = this.deepMerge(target[key] || {}, value);
+            } else {
+                Object.entries(merged).forEach(([k, v]) => {
+                    if (k.startsWith('&') || k.startsWith('@media')) {
+                        merged[k] = {
+                            ...v,
+                            [key]: value,
+                        };
+                    }
+                });
+            }
+        });
+
+        return merged;
     }
 
     generateStylesheet() {
