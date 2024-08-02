@@ -3,10 +3,6 @@
 </p>
 
 <h1 align="center">Programmatic Survey Software</h1>
-<br/>
-
-Well-crafted surveys lead to better data, and better data leads to more informed decisions. 
-<br/>
 
 <p align="center">
   <!-- GitHub Stars -->
@@ -26,19 +22,25 @@ Well-crafted surveys lead to better data, and better data leads to more informed
   <a href="https://join.slack.com/t/roundtablejs/shared_invite/zt-2m09n74yv-B~UeGbxSzGMTO3f0qXhRxQ"><img src="https://img.shields.io/badge/Join%20Slack-4A154B?logo=slack" alt="Join Slack"></a>
 </p>
 
-
-**Surveys are a _craft_**. They are the gateways to new information. *How* you ask determines *what* you receive.
-
-Whether you're conducting market research, gathering academic data, or measuring customer satisfaction, Roundtable gives you the tools to ask the right questions, in the right way, to get the answers you need.
+RoundtableJS is an open-source JavaScript library for building complex surveys, forms, and data annotation tasks. It's designed to be simple but completely customizable. We make it easy to add complex logic (e.g. branching, skipping, looping), modify question types, and fully customize the design.
 
 ## 🌟 Features
 
-- **Designed for the Modern Web:** We’re designed in JavaScript and leverage its asynchronous functionality for managing survey logic. For example, rather than determining this logic based on callbacks that trigger when a page is submitted, our library builds the timeline in an async function which means the logic flows intuitively from top to bottom. 
+- **Designed for the Modern Web:** We're designed in JavaScript and leverage its asynchronous functionality for managing survey logic. For example, rather than determining this logic based on callbacks that trigger when a page is submitted, our library builds the timeline in an async function which means the logic flows intuitively from top to bottom. 
 
-- **Developer-Friendly:** We are open-source and API-first. This problem arose by seeing how difficult it was to integrate our API into other survey softwares. We want the open-source offering to include a robust plugin ecosystem where people can introduce new question types, integrate with tools like CRMs, and control how data is stored and processed. 
+- **Developer-Friendly:** We are open-source and API-first. The idea for RoundtableJS arose by seeing how difficult it was to integrate Roundtable's API into other survey software. We want the open-source offering to include a robust plugin ecosystem where people can introduce new question types, integrate with tools like CRMs, and control how data is stored and processed. 
 
-- **AI-Native Functionality:** Our [cloud offering](https://surveys.roundtable.ai) has AI-native features such as natural language programming and automated fraud detection. We’re continuously expanding our AI features. Let us know what tools you’d like to see!
+- **AI-Native Functionality:** Our [cloud offering](https://surveys.roundtable.ai) has AI-native features such as natural language programming and automated fraud detection. We're continuously expanding our AI features. Let us know what tools you'd like to see!
 
+## 🖼️ Examples
+
+Here are some example surveys built with RoundtableJS. All code is in the [examples/studies](examples/studies) directory.
+
+- [Customer Feedback Survey](https://roundtable.ai/survey/bb1f6ebf6e9c99c938df3fa74e9943d5356bb2a1)
+- [Product Market Fit Survey](https://roundtable.ai/survey/0752ffcf82a327b05abe4484f1e6f8e65a200355)
+- [Book a Demo Form](https://roundtable.ai/survey/1f67699733d860e486f508f593edfcb4ba4f9159)
+- [Enterprise Market Research Survey](https://roundtable.ai/survey/9593255a3aa7231051e75e578747eaea2fde17b3)
+- [Data Annotation Task](https://roundtable.ai/survey/c09e45719a21e7a23565097b60d48532c8e384e9)
 
 ## 🚀 Quick Start
 
@@ -46,7 +48,7 @@ Whether you're conducting market research, gathering academic data, or measuring
 
 ### Option 1: npm
 
-1. Install Roundtable.js using npm:
+1. Install roundtable-js using npm:
    ```bash
    npm install roundtable-js
    ```
@@ -83,10 +85,10 @@ Whether you're conducting market research, gathering academic data, or measuring
    import SingleSelect from 'roundtable-js/question_types/singleSelect.js';
    ```
 
-   For CDN installation, ensure the script is loaded and use the global `roundtableJS` object:
+   For CDN installation, ensure the script is loaded and use the global `RoundtableJS` object:
 
    ```javascript
-   const { Survey, SingleSelect } = roundtableJs;
+   const { Survey, SingleSelect } = RoundtableJS;
    ```
 
 
@@ -168,14 +170,6 @@ Whether you're conducting market research, gathering academic data, or measuring
 
 Read our [full documentation](https://docs.roundtable.ai/rjs/introduction).
 
-## 🛠️ Development / Open-Source Community
-
-Please see our [Contributing Guide](CONTRIBUTING.md).
-
-## 📜 License
-
-Roundtable is open source software [licensed](LICENSE).
-
 ## 🎉 Community
 
 Join our community:
@@ -183,5 +177,13 @@ Join our community:
 - [Twitter](https://twitter.com/roundtabledotai)
 - [Blog](https://roundtable.ai/blog)
 - [LinkedIn](https://www.linkedin.com/company/roundtableAI)
+
+## 🛠️ Development / Open-Source Community
+
+Please see our [Contributing Guide](CONTRIBUTING.md).
+
+## 📜 License
+
+RoundtableJS is open source software [licensed](LICENSE).
 
 ---
