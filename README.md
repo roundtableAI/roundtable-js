@@ -176,7 +176,7 @@ Join our community:
 - [Slack](https://join.slack.com/t/roundtablejs/shared_invite/zt-2m09n74yv-B~UeGbxSzGMTO3f0qXhRxQ)
 - [Twitter](https://twitter.com/roundtabledotai)
 - [Blog](https://roundtable.ai/blog)
-- [LinkedIn](https://www.linkedin.com/company/roundtableAI)
+- [LinkedIn](https://www.linkedin.com/company/roundtable-ai)
 
 ## 🛠️ Development / Open-Source Community
 
