@@ -132,7 +132,7 @@ class OrderedScale extends Element {
                         ${scaleItems.join('')}
                     </div>
                 </div>
-                <div id="${this.id}-error" class="error-message" style="display: block;">Hi there</div>
+                <div id="${this.id}-error" class="error-message" style="display: none;"></div>
             </div>
         `;
     }
