@@ -1,6 +1,6 @@
 <p align="center">
 <a href="https://surveys.roundtable.ai">
-  <img src="assets/images/png-logo-black.png" alt="Roundtable Logo" width = '100' style="border-radius: 16px;">
+  <img src="assets/images/png-logo-black-rounding.png" alt="Roundtable Logo" width = '100'>
 </a>
 
 <h3 align="center">Roundtable</h3>
