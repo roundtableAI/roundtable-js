@@ -1,8 +1,16 @@
 <p align="center">
-  <img src="assets/images/logo-with-text.png" alt="Roundtable Logo" width="500">
-</p>
+<a href="https://surveys.roundtable.ai">
+  <img src="assets/images/png-logo-black.png" alt="Roundtable Logo" width = '100' style="border-radius: 16px;">
+</a>
 
-<h1 align="center">Programmatic Survey Software</h1>
+<h3 align="center">Roundtable</h3>
+<!-- Why is there a line here? -->
+<p align="center"> Programmatic survey software
+<br />
+  <a href="https://surveys.roundtable.ai">Cloud editor</a> ▪
+  <a href="https://docs.roundtable.ai/rjs/introduction">Documentation</a>
+</p>
+</p>
 
 <p align="center">
   <!-- GitHub Stars -->
