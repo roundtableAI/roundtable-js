@@ -20,6 +20,8 @@
   <a href="https://twitter.com/roundtabledotai"><img src="https://img.shields.io/twitter/follow/roundtabledotai?style=social" alt="Twitter Follow"></a>
   <!-- Join Slack -->
   <a href="https://join.slack.com/t/roundtablejs/shared_invite/zt-2m09n74yv-B~UeGbxSzGMTO3f0qXhRxQ"><img src="https://img.shields.io/badge/Join%20Slack-4A154B?logo=slack" alt="Join Slack"></a>
+  <!-- LinkedIn Follow -->
+  <a href="https://www.linkedin.com/company/roundtable-ai"><img src="https://img.shields.io/badge/LinkedIn-Follow-0077B5?logo=linkedin" alt="LinkedIn Follow"></a>
 </p>
 
 RoundtableJS is an open-source JavaScript library for building complex surveys, forms, and data annotation tasks. It's designed to be simple but completely customizable. We make it easy to add complex logic (e.g. branching, skipping, looping), modify question types, and fully customize the design.
