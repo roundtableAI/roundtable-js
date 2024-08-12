@@ -3,11 +3,12 @@
   <img src="assets/images/png-logo-black-rounding.png" alt="Roundtable Logo" width = '100'>
 </a>
 
-<h3 align="center">Roundtable</h3>
+<h3 align="center">RoundtableJS</h3>
 <!-- Why is there a line here? -->
 <p align="center"> Programmatic survey software
 <br />
-  <a href="https://surveys.roundtable.ai">Cloud editor</a> ▪
+  <a href="https://surveys.roundtable.ai">Cloud editor</a> •
+  <a href="https://join.slack.com/t/roundtablejs/shared_invite/zt-2m09n74yv-B~UeGbxSzGMTO3f0qXhRxQ">Slack</a> •
   <a href="https://docs.roundtable.ai/rjs/introduction">Documentation</a>
 </p>
 </p>
