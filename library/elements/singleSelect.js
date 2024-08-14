@@ -87,7 +87,6 @@ class SingleSelect extends Element {
     this.setInitialResponse("");
   }
 
-  // Method to merge styles, giving priority to the last argument (i.e., specific styles)
   mergeStyles(...styles) {
     return styles.reduce((merged, style) => this.deepMerge(merged, style), {});
   }
