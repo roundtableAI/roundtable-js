@@ -95,13 +95,16 @@ class SingleSelect extends Element {
     if (!source || typeof source !== "object") return target;
     if (!target || typeof target !== "object") return source;
 
-    return Object.entries(source).reduce((merged, [key, value]) => {
-      merged[key] =
-        key.startsWith("&") || key.startsWith("@media")
-          ? this.deepMerge(target[key] || {}, value)
-          : value;
-      return merged;
-    }, { ...target });
+    return Object.entries(source).reduce(
+      (merged, [key, value]) => {
+        merged[key] =
+          key.startsWith("&") || key.startsWith("@media")
+            ? this.deepMerge(target[key] || {}, value)
+            : value;
+        return merged;
+      },
+      { ...target }
+    );
   }
 
   getSelectorForKey(key) {
@@ -156,6 +159,14 @@ class SingleSelect extends Element {
               }-error" class="error-message" style="display: none;"></div>
           </div>
       `;
+  }
+
+  shuffleArray(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [array[i], array[j]] = [array[j], array[i]];
+    }
+    return array;
   }
 
   attachEventListeners() {
