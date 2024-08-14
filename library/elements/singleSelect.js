@@ -57,6 +57,7 @@ class SingleSelect extends Element {
     required = true,
     randomize = false,
     styles = {},
+    globalStyles = {},
   }) {
     super({ id, type: "single-select", store_data: true, required });
 
@@ -69,7 +70,14 @@ class SingleSelect extends Element {
     this.options = options;
     this.randomize = Boolean(randomize);
 
-    this.mergeStyles(SingleSelect.defaultStyles, styles);
+    // Merge global styles with component styles, allowing component styles to override
+    const mergedStyles = this.mergeStyles(
+      SingleSelect.defaultStyles,
+      globalStyles,
+      styles
+    );
+
+    this.styles = mergedStyles;
 
     this.addData("text", text);
     this.addData("subText", subText);
@@ -77,6 +85,24 @@ class SingleSelect extends Element {
     this.addData("randomize", this.randomize);
 
     this.setInitialResponse("");
+  }
+
+  // Method to merge styles, giving priority to the last argument (i.e., specific styles)
+  mergeStyles(...styles) {
+    return styles.reduce((merged, style) => this.deepMerge(merged, style), {});
+  }
+
+  deepMerge(target, source) {
+    if (!source || typeof source !== "object") return target;
+    if (!target || typeof target !== "object") return source;
+
+    return Object.entries(source).reduce((merged, [key, value]) => {
+      merged[key] =
+        key.startsWith("&") || key.startsWith("@media")
+          ? this.deepMerge(target[key] || {}, value)
+          : value;
+      return merged;
+    }, { ...target });
   }
 
   getSelectorForKey(key) {
@@ -131,14 +157,6 @@ class SingleSelect extends Element {
               }-error" class="error-message" style="display: none;"></div>
           </div>
       `;
-  }
-
-  shuffleArray(array) {
-    for (let i = array.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [array[i], array[j]] = [array[j], array[i]];
-    }
-    return array;
   }
 
   attachEventListeners() {
