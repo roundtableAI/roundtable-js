@@ -133,7 +133,7 @@ class Survey {
             if (key.startsWith('&') || key.startsWith('@media')) {
                 if(target[key]){
                     Object.entries(target[key]).forEach(([k,v]) => {
-                        if(k in source) target[key][k] = source[k];
+                        if (k in source) target[key][k] = source[k];
                     })
                 }
                 merged[key] = this.deepMerge(target[key] || {}, value);
@@ -141,10 +141,7 @@ class Survey {
                 merged[key] = value;
                 Object.entries(merged).forEach(([k, v]) => {
                     if (k.startsWith('&') || k.startsWith('@media')) {
-                        merged[k] = {
-                            ...v,
-                            [key]: value,
-                        };
+                        merged[k] = { ...v, [key]: value, };
                     }
                 });
             }
