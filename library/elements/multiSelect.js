@@ -1,26 +1,16 @@
 import Element from '../core/element.js';
 
 class MultiSelect extends Element {
-    static styleKeys = ['root', 'innerContainer','label', 'subText', 'optionsContainer', 'option', 'checkbox', 'errorMessage'];
+    static styleKeys = [...Element.styleKeys, 'optionsContainer', 'option', 'checkbox'];
+
+    static selectorMap = {
+        ...Element.selectorMap,
+        optionsContainer: '.options-container',
+        option: '.option',
+        checkbox: 'input[type="checkbox"]'
+    };
 
     static defaultStyles = {
-        root: { 
-            marginBottom: '20px',
-            borderRadius: '5px',
-        },
-        innerContainer: { },
-        label: { 
-            display: 'block',
-            marginBottom: '5px',
-            fontWeight: 'bold',
-            fontSize: '1.1em',
-        },
-        subText: {
-            display: 'block',
-            marginBottom: '10px',
-            color: '#6c757d',
-            fontSize: '1.1em',
-        },
         optionsContainer: {
             display: 'flex',
             flexDirection: 'column'
@@ -30,26 +20,22 @@ class MultiSelect extends Element {
         },
         checkbox: {
             marginRight: '5px'
-        },
-        errorMessage: {
-            color: '#fa5252',
-            fontSize: '0.9em',
-            marginTop: '5px',
         }
     };
 
-    constructor({ 
-        id, 
-        text, 
-        subText = '', 
-        options, 
-        required = true, 
-        randomize = false, 
-        minSelected = 0, 
-        maxSelected = null, 
-        styles = {} 
+    constructor({
+        id,
+        text,
+        subText = '',
+        options,
+        required = true,
+        randomize = false,
+        minSelected = 0,
+        maxSelected = null,
+        customValidation = null,
+        styles = {}
     }) {
-        super({ id, type: 'multi-select', store_data: true, required });
+        super({ id, type: 'multi-select', store_data: true, required, customValidation, styles });
 
         if (!Array.isArray(options) || options.length === 0) {
             throw new Error('Options must be a non-empty array');
@@ -65,29 +51,20 @@ class MultiSelect extends Element {
         this.minSelected = minSelected;
         this.maxSelected = maxSelected;
 
-        this.mergeStyles(MultiSelect.defaultStyles, styles);
-
         this.addData('text', text);
         this.addData('subText', subText);
         this.addData('options', options);
         this.addData('randomize', this.randomize);
         this.addData('minSelected', minSelected);
         this.addData('maxSelected', maxSelected);
-        this.setInitialResponse([]);
+        this.initialResponse = [];
+
+        this.elementStyleKeys = [...MultiSelect.styleKeys];
+        this.selectorMap = { ...MultiSelect.selectorMap };
     }
 
     getSelectorForKey(key) {
-        const selectorMap = {
-            root: '',
-            innerContainer: `#${this.id}-inner-container`,
-            label: '.question-label',
-            subText: '.question-subtext',
-            optionsContainer: '.options-container',
-            option: '.option',
-            checkbox: 'input[type="checkbox"]',
-            errorMessage: '.error-message'
-        };
-        return selectorMap[key] || '';
+        return this.selectorMap[key] || '';
     }
 
     generateHTML() {
@@ -102,7 +79,7 @@ class MultiSelect extends Element {
 
         return `
             <div class="multi-select-question" id="${this.id}-container">
-                <div id="${this.id}-inner-container">
+                <div class="inner-container">
                     <label class="question-label">${this.text}</label>
                     ${this.subText ? `<span class="question-subtext">${this.subText}</span>` : ''}
                     <div class="options-container">
@@ -141,33 +118,24 @@ class MultiSelect extends Element {
     }
 
     setResponse(value) {
-        super.setResponse(value, value.length > 0);
-        this.showValidationError('');
+        super.setResponse(value);
+        this.showValidationError(null);
     }
 
-    validate(showError = false) {
+    validate() {
         const selectedCount = this.data.response ? this.data.response.length : 0;
-        let isValid = true;
-        let errorMessage = '';
 
-        if (this.required && selectedCount === 0) {
-            isValid = false;
-            errorMessage = 'Please select at least one option.';
-        } else if (this.minSelected > 0 && selectedCount < this.minSelected) {
-            isValid = false;
-            errorMessage = `Please select at least ${this.minSelected} option(s).`;
-        } else if (this.maxSelected !== null && selectedCount > this.maxSelected) {
-            isValid = false;
-            errorMessage = `Please select no more than ${this.maxSelected} option(s).`;
+        // MultiSelect-specific validation
+        if (this.minSelected > 0 && selectedCount < this.minSelected) {
+            return { isValid: false, errorMessage: `Please select at least ${this.minSelected} option(s).` };
         }
 
-        if (showError) {
-            this.showValidationError(errorMessage);
-        } else {
-            this.showValidationError('');
+        if (this.maxSelected !== null && selectedCount > this.maxSelected) {
+            return { isValid: false, errorMessage: `Please select no more than ${this.maxSelected} option(s).` };
         }
 
-        return isValid;
+        // If MultiSelect-specific validation passed, call parent's validate method
+        return super.validate();
     }
 }
 

@@ -1,25 +1,14 @@
 import Element from '../core/element.js';
 
 class TextInput extends Element {
-    static styleKeys = ['root', 'innerContainer', 'label', 'subText', 'input', 'errorMessage'];
+    static styleKeys = [...Element.styleKeys, 'input'];
+
+    static selectorMap = {
+        ...Element.selectorMap,
+        input: 'input[type="text"]'
+    };
 
     static defaultStyles = {
-        root: {
-            marginBottom: '20px',
-        },
-        innerContainer: { },
-        label: {
-            display: 'block',
-            marginBottom: '5px',
-            fontWeight: 'bold',
-            fontSize: '1.1em',
-        },
-        subText: {
-            display: 'block',
-            marginBottom: '10px',
-            color: '#6c757d',
-            fontSize: '1.1em',
-        },
         input: {
             width: '100%',
             padding: '12px',
@@ -29,25 +18,21 @@ class TextInput extends Element {
             fontSize: '1em',
             marginBottom: '0px',
             display: 'block',
-        },
-        errorMessage: {
-            marginTop: '5px',
-            color: '#fa5252',
-            fontSize: '0.9em',
         }
     };
 
-    constructor({ 
-        id, 
-        text, 
-        subText = '', 
-        minLength = 0, 
-        maxLength = 255, 
-        placeholder = '', 
-        required = true, 
-        styles = {} 
+    constructor({
+        id,
+        text,
+        subText = '',
+        minLength = 0,
+        maxLength = 255,
+        placeholder = '',
+        required = true,
+        customValidation = null,
+        styles = {},
     }) {
-        super({ id, type: 'text-input', store_data: true, required });
+        super({ id, type: 'text-input', store_data: true, required, customValidation, styles });
 
         if (minLength < 0 || maxLength < minLength) {
             throw new Error('Invalid length constraints');
@@ -59,33 +44,26 @@ class TextInput extends Element {
         this.maxLength = maxLength;
         this.placeholder = placeholder;
 
-        this.mergeStyles(TextInput.defaultStyles, styles);
-
         this.addData('text', text);
         this.addData('subText', subText);
         this.addData('minLength', minLength);
         this.addData('maxLength', maxLength);
-        this.setInitialResponse('');
+
+        this.initialResponse = '';
+        this.elementStyleKeys = [...TextInput.styleKeys];
+        this.selectorMap = { ...TextInput.selectorMap };
     }
 
     getSelectorForKey(key) {
-        const selectorMap = {
-            root: '',
-            innerContainer: `#${this.id}-inner-container`,
-            label: 'label',
-            subText: '.question-subtext',
-            input: 'input',
-            errorMessage: '.error-message'
-        };
-        return selectorMap[key] || '';
+        return this.selectorMap[key] || '';
     }
 
     generateHTML() {
         return `
             <div class="text-input-question" id="${this.id}-container">
-                <div id="${this.id}-inner-container">
+                <div class="inner-container">
                     <label for="${this.id}">${this.text}</label>
-                    ${this.subText && `<span class="question-subtext">${this.subText}</span>`}
+                    ${this.subText ? `<span class="question-subtext">${this.subText}</span>` : ''}
                     <input 
                         type="text"
                         id="${this.id}" 
@@ -112,33 +90,24 @@ class TextInput extends Element {
     }
 
     setResponse(value) {
-        super.setResponse(value, value.trim() !== '');
+        super.setResponse(value);
         this.addData('responseLength', value.length);
+        this.showValidationError(null);
     }
 
-    validate(showError = false) {
+    validate() {
         const value = this.data.response || '';
-        let isValid = true;
-        let errorMessage = '';
 
-        if (this.required && value.trim().length === 0) {
-            isValid = false;
-            errorMessage = 'This field is required.';
-        } else if (value.length < this.minLength) {
-            isValid = false;
-            errorMessage = `Please enter at least ${this.minLength} characters.`;
-        } else if (value.length > this.maxLength) {
-            isValid = false;
-            errorMessage = `Please enter no more than ${this.maxLength} characters.`;
+        // TextInput-specific validation
+        if (value.length < this.minLength) {
+            return { isValid: false, errorMessage: `Please enter at least ${this.minLength} characters.` };
+        }
+        if (value.length > this.maxLength) {
+            return { isValid: false, errorMessage: `Please enter no more than ${this.maxLength} characters.` };
         }
 
-        if (showError) {
-            this.showValidationError(errorMessage);
-        } else {
-            this.showValidationError('');
-        }
-
-        return isValid;
+        // If TextInput-specific validation passed, call parent's validate method
+        return super.validate();
     }
 }
 

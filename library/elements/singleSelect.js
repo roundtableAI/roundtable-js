@@ -1,26 +1,16 @@
 import Element from '../core/element.js';
 
 class SingleSelect extends Element {
-    static styleKeys = ['root', 'innerContainer' ,'label', 'subText', 'optionsContainer', 'option', 'radio', 'errorMessage'];
+    static styleKeys = [...Element.styleKeys, 'optionsContainer', 'option', 'radio'];
+
+    static selectorMap = {
+        ...Element.selectorMap,
+        optionsContainer: '.options-container',
+        option: '.option',
+        radio: 'input[type="radio"]'
+    };
 
     static defaultStyles = {
-        root: { 
-            marginBottom: '20px',
-            borderRadius: '5px'
-        },
-        innerContainer: {  },
-        label: { 
-            display: 'block',
-            marginBottom: '5px',
-            fontWeight: 'bold',
-            fontSize: '1.1em',
-        },
-        subText: {
-            display: 'block',
-            marginBottom: '10px',
-            color: '#6c757d',
-            fontSize: '1.1em',
-        },
         optionsContainer: {
             display: 'flex',
             flexDirection: 'column'
@@ -30,17 +20,22 @@ class SingleSelect extends Element {
         },
         radio: {
             marginRight: '5px'
-        },
-        errorMessage: {
-            color: '#fa5252',
-            fontSize: '0.9em',
-            marginTop: '5px'
         }
     };
 
-    constructor({ id, text, subText = '', options, required = true, randomize = false, styles = {} }) {
-        super({ id, type: 'single-select', store_data: true, required });
-        
+    constructor({
+        id,
+        text,
+        subText = '',
+        options,
+        required = true,
+        randomize = false,
+        styles = {},
+        customValidation = null
+    }) {
+        super({ id, type: 'single-select', store_data: true, required, styles, customValidation });
+
+
         if (!Array.isArray(options) || options.length === 0) {
             throw new Error('Options must be a non-empty array');
         }
@@ -49,29 +44,19 @@ class SingleSelect extends Element {
         this.subText = subText;
         this.options = options;
         this.randomize = Boolean(randomize);
-        
-        this.mergeStyles(SingleSelect.defaultStyles, styles);
-        
+
         this.addData('text', text);
         this.addData('subText', subText);
         this.addData('options', options);
         this.addData('randomize', this.randomize);
-        
-        this.setInitialResponse('');
+
+        this.initialResponse = '';
+        this.elementStyleKeys = [...SingleSelect.styleKeys];
+        this.selectorMap = { ...SingleSelect.selectorMap };
     }
 
     getSelectorForKey(key) {
-        const selectorMap = {
-            root: '',
-            innerContainer: `#${this.id}-inner-container`,
-            label: '.question-label',
-            subText: '.question-subtext',
-            optionsContainer: '.options-container',
-            option: '.option',
-            radio: 'input[type="radio"]',
-            errorMessage: '.error-message'
-        };
-        return selectorMap[key] || '';
+        return this.selectorMap[key] || '';
     }
 
     generateHTML() {
@@ -86,7 +71,7 @@ class SingleSelect extends Element {
 
         return `
             <div class="single-select-question" id="${this.id}-container">
-                <div id="${this.id}-inner-container">
+                <div class="inner-container">
                     <label class="question-label" for="${this.id}-0">${this.text}</label>
                     ${this.subText ? `<span class="question-subtext">${this.subText}</span>` : ''}
                     <div class="options-container">
@@ -118,18 +103,24 @@ class SingleSelect extends Element {
     }
 
     setResponse(value) {
-        super.setResponse(value, value !== '');
-        this.showValidationError('');
+        super.setResponse(value);
+        this.showValidationError(null);
     }
 
-    validate(showError = false) {
-        const isValid = !this.required || (this.data.response && this.data.response !== '');
-        if (showError && !isValid) {
-            this.showValidationError('Please select an option.');
-        } else {
-            this.showValidationError('');
+    validate() {
+        const value = this.data.response;
+
+        // SingleSelect-specific validation
+        if (!value) {
+            return { isValid: false, errorMessage: 'Please select an option.' };
         }
-        return isValid;
+
+        if (!this.options.includes(value)) {
+            return { isValid: false, errorMessage: 'Selected option is not valid.' };
+        }
+
+        // If SingleSelect-specific validation passed, call parent's validate method
+        return super.validate();
     }
 }
 

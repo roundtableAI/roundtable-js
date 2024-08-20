@@ -1,21 +1,17 @@
 import Element from '../core/element.js';
 
 class BoundingBox extends Element {
-    static styleKeys = ['root', 'innerContainer', 'label', 'canvas', 'controls', 'controlPoint', 'button', 'errorMessage'];
+    static styleKeys = [...Element.styleKeys, 'canvas', 'controls', 'controlPoint', 'button'];
+
+    static selectorMap = {
+        ...Element.selectorMap,
+        canvas: 'canvas',
+        controls: '.controls',
+        controlPoint: '.control-point',
+        button: 'button'
+    };
 
     static defaultStyles = {
-        root: {
-            position: 'relative',
-            marginBottom: '20px',
-            width: '100%',
-        },
-        innerContainer: { },
-        label: {
-            display: 'block',
-            fontSize: '1.1em',
-            fontWeight: 'bold',
-            marginBottom: '10px',
-        },
         canvas: {
             cursor: 'crosshair',
             display: 'block',
@@ -50,11 +46,6 @@ class BoundingBox extends Element {
                 cursor: 'not-allowed',
             }
         },
-        errorMessage: {
-            color: '#fa5252',
-            fontSize: '0.9em',
-            marginTop: '5px',
-        },
     };
 
     constructor({
@@ -65,9 +56,10 @@ class BoundingBox extends Element {
         boxOpacity = 0.3,
         maxBoxes = Infinity,
         required = true,
+        customValidation = null,
         styles = {}
     }) {
-        super({ id, type: 'bounding-box', store_data: true, required });
+        super({ id, type: 'bounding-box', store_data: true, required, customValidation, styles });
 
         if (!imageUrl) {
             throw new Error('Image URL is required');
@@ -79,11 +71,33 @@ class BoundingBox extends Element {
         this.boxOpacity = boxOpacity;
         this.maxBoxes = maxBoxes;
 
-        this.mergeStyles(BoundingBox.defaultStyles, styles);
-
         this.initializeState();
         this.bindEventHandlers();
-        this.setInitialResponse([]);
+        this.initialResponse = [];
+
+        this.elementStyleKeys = [...BoundingBox.styleKeys];
+        this.selectorMap = { ...BoundingBox.selectorMap };
+    }
+
+    getSelectorForKey(key) {
+        return this.selectorMap[key] || '';
+    }
+
+    generateHTML() {
+        return `
+            <div class="bounding-box-question" id="${this.id}-container">
+                <div class="inner-container">
+                    <label class="question-label">${this.text}</label>
+                    <canvas id="${this.id}-canvas"></canvas>
+                    <div>
+                        <button id="${this.id}-clear" class="bounding-box-button">Clear</button>
+                        <button id="${this.id}-undo" class="bounding-box-button" disabled>Undo</button>
+                        <button id="${this.id}-remove" class="bounding-box-button" disabled>Remove</button>
+                    </div>
+                </div>
+                <div id="${this.id}-error" class="error-message" style="display: none;"></div>
+            </div>
+        `;
     }
 
     initializeState() {
@@ -113,37 +127,6 @@ class BoundingBox extends Element {
         this.handleCursorUpdate = this.handleCursorUpdate.bind(this);
         this.handleKeyDown = this.handleKeyDown.bind(this);
         this.handleResize = this.handleResize.bind(this);
-    }
-
-    getSelectorForKey(key) {
-        const selectorMap = {
-            root: '',
-            innerContainer: `#${this.id}-inner-container`,
-            label: '.question-label',
-            canvas: 'canvas',
-            controls: '.controls',
-            controlPoint: '.control-point',
-            button: 'button',
-            errorMessage: '.error-message'
-        };
-        return selectorMap[key] || '';
-    }
-
-    generateHTML() {
-        return `
-            <div id="${this.id}-container" class="bounding-box-question">
-                <div id = "${this.id}-inner-container">
-                    <label class="question-label">${this.text}</label>
-                    <canvas id="${this.id}-canvas"></canvas>
-                    <div>
-                        <button id="${this.id}-clear" class="bounding-box-button">Clear</button>
-                        <button id="${this.id}-undo" class="bounding-box-button" disabled>Undo</button>
-                        <button id="${this.id}-remove" class="bounding-box-button" disabled>Remove</button>
-                    </div>
-                </div>
-                <div id="${this.id}-error" class="error-message" style="display: none;"></div>
-            </div>
-        `;
     }
 
     attachEventListeners() {
@@ -581,17 +564,20 @@ class BoundingBox extends Element {
 
     setResponse(value) {
         super.setResponse(value, value.length > 0);
-        this.showValidationError('');
+        this.showValidationError(null);
     }
 
-    validate(showError = false) {
-        const isValid = !this.required || this.boxes.length > 0;
-        if (showError && !isValid) {
-            this.showValidationError('Please draw at least one bounding box.');
-        } else {
-            this.showValidationError('');
+    validate() {
+        // BoundingBox-specific validation
+        if (this.required && this.boxes.length === 0) {
+            return {
+                isValid: false,
+                errorMessage: 'Please draw at least one bounding box.'
+            };
         }
-        return isValid;
+
+        // If BoundingBox-specific validation passed, call parent's validate method
+        return super.validate();
     }
 
     destroy() {

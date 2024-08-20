@@ -1,26 +1,18 @@
 import Element from '../core/element.js';
 
 class OrderedScale extends Element {
-    static styleKeys = ['root', 'innerContainer', 'label', 'subText', 'scaleContainer', 'scaleItem', 'scaleLabel', 'scaleInput', 'scaleNumber', 'errorMessage'];
+    static styleKeys = [...Element.styleKeys, 'scaleContainer', 'scaleItem', 'scaleLabel', 'scaleInput', 'scaleNumber'];
+
+    static selectorMap = {
+        ...Element.selectorMap,
+        scaleContainer: '.scale-container',
+        scaleItem: '.scale-item',
+        scaleLabel: '.scale-label',
+        scaleInput: 'input[type="radio"]',
+        scaleNumber: '.scale-number'
+    };
 
     static defaultStyles = {
-        root: { 
-            marginBottom: '20px',
-            borderRadius: '5px'
-        },
-        innerContainer: {},
-        label: { 
-            display: 'block',
-            marginBottom: '5px',
-            fontWeight: 'bold',
-            fontSize: '1.1em',
-        },
-        subText: {
-            display: 'block',
-            marginBottom: '10px',
-            color: '#6c757d',
-            fontSize: '0.9em',
-        },
         scaleContainer: {
             display: 'flex',
             justifyContent: 'space-between',
@@ -50,26 +42,22 @@ class OrderedScale extends Element {
         scaleNumber: {
             marginBottom: '5px',
             fontSize: '0.9em',
-        },
-        errorMessage: {
-            color: '#fa5252',
-            fontSize: '0.9em',
-            marginTop: '5px',
         }
     };
 
-    constructor({ 
-        id, 
-        text, 
-        subText = '', 
-        required = true, 
-        min = 1, 
-        max = 7, 
-        labels = [], 
-        styles = {} 
+    constructor({
+        id,
+        text,
+        subText = '',
+        required = true,
+        min = 1,
+        max = 7,
+        labels = [],
+        customValidation = null,
+        styles = {}
     }) {
-        super({ id, type: 'ordered-scale', store_data: true, required });
-        
+        super({ id, type: 'ordered-scale', store_data: true, required, customValidation, styles });
+
         if (min >= max) {
             throw new Error('Min value must be less than max value');
         }
@@ -82,32 +70,21 @@ class OrderedScale extends Element {
         this.min = min;
         this.max = max;
         this.labels = labels;
-        
-        this.mergeStyles(OrderedScale.defaultStyles, styles);
-        
+
         this.addData('text', text);
         this.addData('subText', subText);
         this.addData('min', min);
         this.addData('max', max);
         this.addData('labels', labels);
-        
-        this.setInitialResponse(null);
+
+        this.initialResponse = null;
+
+        this.elementStyleKeys = [...OrderedScale.styleKeys];
+        this.selectorMap = { ...OrderedScale.selectorMap };
     }
 
     getSelectorForKey(key) {
-        const selectorMap = {
-            root: '',
-            innerContainer: `#${this.id}-inner-container`,
-            label: '.question-label',
-            subText: '.question-subtext',
-            scaleContainer: '.scale-container',
-            scaleItem: '.scale-item',
-            scaleLabel: '.scale-label',
-            scaleInput: 'input[type="radio"]',
-            scaleNumber: '.scale-number',
-            errorMessage: '.error-message'
-        };
-        return selectorMap[key] || '';
+        return this.selectorMap[key] || '';
     }
 
     generateHTML() {
@@ -125,9 +102,9 @@ class OrderedScale extends Element {
 
         return `
             <div class="ordered-scale-question" id="${this.id}-container">
-                <div id="${this.id}-inner-container">
+                <div class="inner-container">
                     <label class="question-label" for="${this.id}-${this.min}">${this.text}</label>
-                    ${this.subText && `<span class="question-subtext">${this.subText}</span>`}
+                    ${this.subText ? `<span class="question-subtext">${this.subText}</span>` : ''}
                     <div class="scale-container">
                         ${scaleItems.join('')}
                     </div>
@@ -149,18 +126,24 @@ class OrderedScale extends Element {
     }
 
     setResponse(value) {
-        super.setResponse(value, value !== null);
-        this.showValidationError('');
+        super.setResponse(value);
+        this.showValidationError(null);
     }
 
-    validate(showError = false) {
-        const isValid = !this.required || (this.data.response !== null && !isNaN(this.data.response));
-        if (showError && !isValid) {
-            this.showValidationError('Please select a rating.');
-        } else {
-            this.showValidationError('');
+    validate() {
+        // OrderedScale-specific validation
+        const response = this.data.response;
+
+        if (response === null || isNaN(response)) {
+            return { isValid: false, errorMessage: 'Please select a rating.' };
         }
-        return isValid;
+
+        if (response < this.min || response > this.max) {
+            return { isValid: false, errorMessage: `Please select a rating between ${this.min} and ${this.max}.` };
+        }
+
+        // If OrderedScale-specific validation passed, call parent's validate method
+        return super.validate();
     }
 }
 

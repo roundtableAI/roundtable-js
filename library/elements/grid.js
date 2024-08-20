@@ -1,26 +1,20 @@
 import Element from '../core/element.js';
 
 class Grid extends Element {
-    static styleKeys = ['root', 'innerContainer', 'label', 'subText', 'table', 'headerRow', 'headerCell', 'row', 'rowLabel', 'cell', 'radio', 'errorMessage'];
+    static styleKeys = [...Element.styleKeys, 'table', 'headerRow', 'headerCell', 'row', 'rowLabel', 'cell', 'radio'];
+
+    static selectorMap = {
+        ...Element.selectorMap,
+        table: 'table',
+        headerRow: 'thead tr',
+        headerCell: 'thead th',
+        row: 'tbody tr',
+        rowLabel: 'tbody td.row-label',
+        cell: 'tbody td',
+        radio: 'input[type="radio"]'
+    };
 
     static defaultStyles = {
-        root: { 
-            marginBottom: '20px',
-            borderRadius: '5px'
-        },
-        innerContainer: { },
-        label: { 
-            display: 'block',
-            marginBottom: '5px',
-            fontWeight: 'bold',
-            fontSize: '1.1em',
-        },
-        subText: {
-            display: 'block',
-            marginBottom: '10px',
-            color: '#6c757d',
-            fontSize: '1.1em',
-        },
         table: {
             width: '100%',
             borderCollapse: 'collapse'
@@ -47,26 +41,22 @@ class Grid extends Element {
         },
         radio: {
             margin: '0 auto'
-        },
-        errorMessage: {
-            color: '#fa5252',
-            fontSize: '0.9em',
-            marginTop: '5px',
         }
     };
 
-    constructor({ 
-        id, 
-        text, 
-        subText = '', 
-        rows, 
-        columns, 
-        required = true, 
-        randomizeRows = false, 
-        randomizeColumns = false, 
-        styles = {} 
+    constructor({
+        id,
+        text,
+        subText = '',
+        rows,
+        columns,
+        required = true,
+        randomizeRows = false,
+        randomizeColumns = false,
+        customValidation = null,
+        styles = {}
     }) {
-        super({ id, type: 'grid', store_data: true, required });
+        super({ id, type: 'grid', store_data: true, required, customValidation, styles });
 
         if (!Array.isArray(rows) || rows.length === 0 || !Array.isArray(columns) || columns.length === 0) {
             throw new Error('Rows and columns must be non-empty arrays');
@@ -79,8 +69,6 @@ class Grid extends Element {
         this.randomizeRows = Boolean(randomizeRows);
         this.randomizeColumns = Boolean(randomizeColumns);
 
-        this.mergeStyles(Grid.defaultStyles, styles);
-
         this.addData('text', text);
         this.addData('subText', subText);
         this.addData('rows', rows);
@@ -88,25 +76,14 @@ class Grid extends Element {
         this.addData('randomizeRows', this.randomizeRows);
         this.addData('randomizeColumns', this.randomizeColumns);
 
-        this.setInitialResponse({});
+        this.initialResponse = {};
+
+        this.elementStyleKeys = [...Grid.styleKeys];
+        this.selectorMap = { ...Grid.selectorMap };
     }
 
     getSelectorForKey(key) {
-        const selectorMap = {
-            root: '',
-            innerContainer: `#${this.id}-inner-container`,
-            label: '.question-label',
-            subText: '.question-subtext',
-            table: 'table',
-            headerRow: 'thead tr',
-            headerCell: 'thead th',
-            row: 'tbody tr',
-            rowLabel: 'tbody td.row-label',
-            cell: 'tbody td',
-            radio: 'input[type="radio"]',
-            errorMessage: '.error-message'
-        };
-        return selectorMap[key] || '';
+        return this.selectorMap[key] || '';
     }
 
     generateHTML() {
@@ -134,7 +111,7 @@ class Grid extends Element {
 
         return `
             <div class="grid-question" id="${this.id}-container">
-                <div id="${this.id}-inner-container">
+                <div class="inner-container">
                     <label class="question-label">${this.text}</label>
                     ${this.subText ? `<span class="question-subtext">${this.subText}</span>` : ''}
                     <table>
@@ -174,22 +151,23 @@ class Grid extends Element {
     }
 
     setResponse(value) {
-        const valueHasEntries = Object.values(value).some(val => val !== null);
-        super.setResponse(value, valueHasEntries);
-        this.showValidationError('');
+        super.setResponse(value);
+        this.showValidationError(null);
     }
 
-    validate(showError = false) {
+    validate() {
+        // Grid-specific validation
         const unansweredRows = this.rows.filter(row => !this.data.response[row]);
-        const isValid = !this.required || unansweredRows.length === 0;
-        
-        if (showError && !isValid) {
-            this.showValidationError(`Please provide a response for all rows. Missing: ${unansweredRows.join(', ')}`);
-        } else {
-            this.showValidationError('');
+
+        if (unansweredRows.length > 0) {
+            return {
+                isValid: false,
+                errorMessage: `Please provide a response for all rows. Missing: ${unansweredRows.join(', ')}`
+            };
         }
 
-        return isValid;
+        // If Grid-specific validation passed, call parent's validate method
+        return super.validate();
     }
 }
 

@@ -1,5 +1,6 @@
 class Survey {
     static styleKeys = ['body', 'container', 'question', 'navigation', 'button', 'errorMessage', 'nextButtonError', 'finishMessage'];
+    static elementStyleKeys = ['root', 'innerContainer', 'label', 'subText', 'errorMessage'];
 
     static defaultStyles = {
         body: {
@@ -20,7 +21,6 @@ class Survey {
             margin: '0 auto',
             padding: '25px',
             backgroundColor: '#ffffff',
-            boxSizing: 'border-box',
             boxShadow: '0 0 10px rgba(0,0,0,0.1)',
             borderRadius: '12px',
             '@media (max-width: 650px)': {
@@ -63,11 +63,36 @@ class Survey {
         finishMessage: {
             display: 'none',
             fontSize: '1.1em',
-            fontWeight: 'bold',
             textAlign: 'center',
         },
     };
 
+    static defaultElementStyles = {
+        root: { 
+            marginBottom: '20px',
+            borderRadius: '5px'
+        },
+        innerContainer: {
+            marginTop: '5px',
+        },
+        label: { 
+            display: 'block',
+            fontWeight: '600',
+            fontSize: '1.1em',
+            marginBottom: '5px',
+        },
+        subText: {
+            display: 'block',
+            marginBottom: '10px',
+            color: '#6c757d',
+            fontSize: '1.1em',
+        },
+        errorMessage: {
+            color: '#fa5252',
+            fontSize: '0.9em',
+            marginTop: '5px'
+        }
+    };
 
     constructor(customSurveyDetails = {}) {
         this.responses = [];
@@ -75,8 +100,6 @@ class Survey {
         this.nextButtonListener = null;
         this.plugins = [];
         this.currentPageElements = [];
-        this.nextButtonListener = null;
-
 
         this.surveyDetails = {
             startTime: new Date().toISOString(),
@@ -84,6 +107,7 @@ class Survey {
         };
 
         this.globalStyles = this.mergeStyles(Survey.defaultStyles, this.surveyDetails.styles || {});
+        this.elementStyles = this.mergeStyles(Survey.defaultElementStyles, this.surveyDetails.styles?.Element || {});
 
         if (document.readyState === 'loading') {
             document.addEventListener('DOMContentLoaded', () => this.initialize());
@@ -102,51 +126,24 @@ class Survey {
         }
     }
 
+    mergeStyles(defaultStyles, customStyles) {
+        const mergedStyles = { ...defaultStyles };
+        
+        for (const [key, value] of Object.entries(customStyles)) {
+            if (typeof value === 'object' && value !== null && !Array.isArray(value)) {
+                mergedStyles[key] = this.mergeStyles(mergedStyles[key] || {}, value);
+            } else {
+                mergedStyles[key] = value;
+            }
+        }
+        
+        return mergedStyles;
+    }
+
     applyGlobalStyles() {
         const styleElement = document.createElement('style');
         styleElement.textContent = this.generateStylesheet();
         document.head.appendChild(styleElement);
-    }
-
-    revealContent() {
-        const surveyContainer = document.getElementById('survey-container');
-        if (surveyContainer) {
-            surveyContainer.classList.remove('hidden');
-        } else {
-            console.warn('Survey container not found');
-        }
-    }
-
-    mergeStyles(defaultStyles, customStyles) {
-        return Object.fromEntries(
-            Survey.styleKeys.map(key => [key, this.deepMerge(defaultStyles[key], customStyles[key])])
-        );
-    }
-
-    deepMerge(target, source) {
-        if (!source || typeof source !== 'object') return target;
-        if (!target || typeof target !== 'object') return source;
-    
-        const merged = { ...target };
-    
-        Object.entries(source).forEach(([key, value]) => {
-            if (key.startsWith('&') || key.startsWith('@media')) {
-                if(target[key]){
-                    Object.entries(target[key]).forEach(([k,v]) => {
-                        if (k in source) target[key][k] = source[k];
-                    })
-                }
-                merged[key] = this.deepMerge(target[key] || {}, value);
-            } else {
-                merged[key] = value;
-                Object.entries(merged).forEach(([k, v]) => {
-                    if (k.startsWith('&') || k.startsWith('@media')) {
-                        merged[k] = { ...v, [key]: value, };
-                    }
-                });
-            }
-        });
-        return merged;
     }
 
     generateStylesheet() {
@@ -170,6 +167,8 @@ class Survey {
     }
 
     generateStyleForSelector(selector, rules) {
+        if (!rules || typeof rules !== 'object') return '';
+
         const baseStyles = this.rulesToString(rules);
         let styleString = `${selector} { ${baseStyles} }`;
 
@@ -182,7 +181,7 @@ class Survey {
                     styleString += `\n${selector}${key.slice(1)} { ${this.rulesToString(value)} }`;
                 }
             });
-
+ 
         return styleString;
     }
 
@@ -205,6 +204,15 @@ class Survey {
         });
     }
 
+    revealContent() {
+        const surveyContainer = document.getElementById('survey-container');
+        if (surveyContainer) {
+            surveyContainer.classList.remove('hidden');
+        } else {
+            console.warn('Survey container not found');
+        }
+    }
+
     addPlugin(plugin) {
         if (typeof plugin.initialize === 'function') {
             this.plugins.push(plugin);
@@ -212,6 +220,16 @@ class Survey {
         } else {
             console.warn('Invalid plugin: missing initialize method');
         }
+    }
+
+    removePlugin(plugin) {
+        const index = this.plugins.indexOf(plugin);
+        if (index > -1) {
+            plugin.destroy();
+            this.plugins.splice(index, 1);
+            return true;
+        }
+        return false;
     }
 
     setSurveyDetail(key, value) {
@@ -224,7 +242,6 @@ class Survey {
 
     async showPage(page) {
         try {
-            // Clean up elements from the previous page
             this.cleanupCurrentPage();
 
             this.currentPage = page;
@@ -241,10 +258,9 @@ class Survey {
             questionContainer.id = 'question-container';
             pageContainer.appendChild(questionContainer);
 
-            // Render new elements and keep track of them
             this.currentPageElements = [];
             for (const element of page.elements) {
-                element.render();
+                element.render(this.elementStyles);
                 this.currentPageElements.push(element);
             }
 
@@ -270,7 +286,6 @@ class Survey {
             this.currentPageElements = [];
         }
 
-        // Clean up the next button listener
         const nextButton = document.getElementById('next-button');
         if (nextButton && this.nextButtonListener) {
             nextButton.removeEventListener('click', this.nextButtonListener);
@@ -301,6 +316,7 @@ class Survey {
                         nextButtonError.textContent = '';
                         resolve();
                     } else {
+                        console.log('here...')
                         nextButtonError.style.display = 'inline-block';
                         nextButtonError.textContent = 'Please check your answers.';
                     }
@@ -317,9 +333,12 @@ class Survey {
         let isValid = true;
         for (const element of this.currentPage.elements) {
             if (typeof element.validate === 'function') {
-                const elementValid = await element.validate(true);
+                const { isValid: elementValid, errorMessage } = await element.validate();
                 if (!elementValid) {
                     isValid = false;
+                    element.showValidationError(errorMessage);
+                } else {
+                    element.showValidationError(null); // Clear any previous error
                 }
             }
         }
@@ -365,10 +384,8 @@ class Survey {
 
     finishSurvey(message) {
         try {
-            // Clean up elements from the last page
             this.cleanupCurrentPage();
 
-            // Remove navigation elements
             const navigation = document.getElementById('navigation');
             if (navigation) navigation.remove();
 
@@ -376,19 +393,16 @@ class Survey {
                 plugin.beforeSurveyFinish();
             }
 
-            // Clear the page container
             const pageContainer = document.getElementById('page-container');
             if (pageContainer) {
                 pageContainer.innerHTML = '';
             }
 
-            // Display the finish message
             const finishElement = document.getElementById('finish') || document.createElement('div');
             finishElement.id = 'finish';
             finishElement.innerHTML = message;
             finishElement.style.display = 'block';
 
-            // If the finish element doesn't exist in the DOM, append it
             if (!document.getElementById('finish')) {
                 const surveyContainer = document.getElementById('survey-container');
                 if (surveyContainer) {

@@ -1,25 +1,14 @@
 import Element from '../core/element.js';
 
 class OpenEnd extends Element {
-    static styleKeys = ['root', 'innerContainer','label', 'subText', 'textarea', 'errorMessage'];
+    static styleKeys = [...Element.styleKeys, 'textarea'];
+
+    static selectorMap = {
+        ...Element.selectorMap,
+        textarea: 'textarea'
+    };
 
     static defaultStyles = {
-        root: {
-            marginBottom: '20px',
-        },
-        innerContainer: { },
-        label: {
-            display: 'block',
-            marginBottom: '5px',
-            fontWeight: 'bold',
-            fontSize: '1.1em',
-        },
-        subText: {
-            display: 'block',
-            marginBottom: '10px',
-            color: '#6c757d',
-            fontSize: '1.1em',
-        },
         textarea: {
             width: '100%',
             padding: '12px',
@@ -30,27 +19,23 @@ class OpenEnd extends Element {
             fontSize: '1em',
             marginBottom: '0px',
             display: 'block',
-        },
-        errorMessage: {
-            marginTop: '5px',
-            color: '#fa5252',
-            fontSize: '0.9em',
         }
     };
 
-    constructor({ 
-        id, 
-        text, 
-        subText = '', 
-        minLength = 0, 
-        maxLength = 10000, 
-        rows = 2, 
-        placeholder = '', 
-        required = true, 
-        includeAlias = true, 
-        styles = {} 
+    constructor({
+        id,
+        text,
+        subText = '',
+        minLength = 0,
+        maxLength = 10000,
+        rows = 2,
+        placeholder = '',
+        required = true,
+        includeAlias = true,
+        customValidation = null,
+        styles = {}
     }) {
-        super({ id, type: 'open-end', store_data: true, required });
+        super({ id, type: 'open-end', store_data: true, required, customValidation, styles });
 
         if (minLength < 0 || maxLength < minLength) {
             throw new Error('Invalid length constraints');
@@ -63,11 +48,11 @@ class OpenEnd extends Element {
         this.rows = rows;
         this.placeholder = placeholder;
         this.includeAlias = Boolean(includeAlias);
-        this.mergeStyles(OpenEnd.defaultStyles, styles);
         this.aliasMaxLength = 10000;
         this.aliasTypingHistory = [];
         this.aliasStartTime = null;
         this.aliasTextOverLength = false;
+
         this.addData('text', text);
         this.addData('subText', subText);
         this.addData('minLength', minLength);
@@ -75,27 +60,22 @@ class OpenEnd extends Element {
         this.addData('includeAlias', this.includeAlias);
         this.addData('aliasMaxLength', this.aliasMaxLength);
         this.addData('aliasTypingHistory', this.aliasTypingHistory);
-        this.setInitialResponse('');
+        this.initialResponse = '';
+
+        this.elementStyleKeys = [...OpenEnd.styleKeys];
+        this.selectorMap = { ...OpenEnd.selectorMap };
     }
 
     getSelectorForKey(key) {
-        const selectorMap = {
-            root: '',
-            innerContainer: `#${this.id}-inner-container`,
-            label: 'label',
-            subText: '.question-subtext',
-            textarea: 'textarea',
-            errorMessage: '.error-message'
-        };
-        return selectorMap[key] || '';
+        return this.selectorMap[key] || '';
     }
 
     generateHTML() {
         return `
             <div class="open-end-question" id="${this.id}-container">
-                <div id="${this.id}-inner-container">
+                <div class="inner-container">
                     <label for="${this.id}">${this.text}</label>
-                    ${this.subText && `<span class="question-subtext">${this.subText}</span>`}
+                    ${this.subText ? `<span class="question-subtext">${this.subText}</span>` : ''}
                     <textarea 
                         id="${this.id}" 
                         name="${this.id}" 
@@ -156,33 +136,24 @@ class OpenEnd extends Element {
     }
 
     setResponse(value) {
-        super.setResponse(value, value.trim() !== '');
+        super.setResponse(value);
         this.addData('responseLength', value.length);
+        this.showValidationError(null);
     }
 
-    validate(showError = false) {
+    validate() {
+        // OpenEnd-specific validation
         const value = this.data.response || '';
-        let isValid = true;
-        let errorMessage = '';
 
-        if (this.required && value.trim().length === 0) {
-            isValid = false;
-            errorMessage = 'This field is required.';
-        } else if (value.length < this.minLength) {
-            isValid = false;
-            errorMessage = `Please enter at least ${this.minLength} characters.`;
-        } else if (value.length > this.maxLength) {
-            isValid = false;
-            errorMessage = `Please enter no more than ${this.maxLength} characters.`;
+        if (value.length < this.minLength) {
+            return { isValid: false, errorMessage: `Please enter at least ${this.minLength} characters.` };
+        }
+        if (value.length > this.maxLength) {
+            return { isValid: false, errorMessage: `Please enter no more than ${this.maxLength} characters.` };
         }
 
-        if (showError) {
-            this.showValidationError(errorMessage);
-        } else {
-            this.showValidationError('');
-        }
-
-        return isValid;
+        // If OpenEnd-specific validation passes, call parent's validate method
+        return super.validate();
     }
 
     destroy() {

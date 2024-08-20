@@ -6,9 +6,17 @@ class Element {
         responseTimestamp: null
     };
 
-    static defaultStyles = {};
+    static styleKeys = ['root', 'innerContainer', 'label', 'subText', 'errorMessage'];
 
-    constructor({ id, type, store_data = false, required = false }) {
+    static selectorMap = {
+        root: '',
+        innerContainer: '.inner-container',
+        label: '.question-label',
+        subText: '.question-subtext',
+        errorMessage: '.error-message'
+    };
+
+    constructor({ id, type, store_data = false, required = false, customValidation = null, styles = {} }) {
         if (!id || typeof id !== 'string') {
             throw new Error('Invalid id: must be a non-empty string');
         }
@@ -21,44 +29,35 @@ class Element {
         this.required = Boolean(required);
         this.data = { id, type, response: null, responded: false };
         this.initialResponse = null;
-        this.styles = {};
+        this.styles = styles;
         this.eventListeners = [];
+        this.elementStyleKeys = [...this.constructor.styleKeys];
+        this.selectorMap = { ...this.constructor.selectorMap };
+        this.customValidation = customValidation;
     }
 
-    validate() {
-        if (this.required && !this.data.response) {
-            this.showValidationError('This question is required. Please provide an answer.');
-            return false;
+    mergeStyles(surveyElementStyles, elementStyles) {
+        const mergedStyles = {};
+        this.elementStyleKeys.forEach(key => {
+            mergedStyles[key] = {
+                ...(surveyElementStyles[key] || {}),
+                ...(this.constructor.defaultStyles?.[key] || {}),
+                ...(this.styles[key] || {}),
+                ...(elementStyles[key] || {})
+            };
+        });
+        return mergedStyles;
+    }
+
+    generateStylesheet(surveyElementStyles) {
+        const mergedStyles = this.mergeStyles(surveyElementStyles, this.styles);
+        return this.elementStyleKeys.map(key =>  {
+            return this.generateStyleForSelector(this.getSelectorForKey(key), mergedStyles[key])
         }
-        this.showValidationError(null);
-        return true;
-    }
-
-    showValidationError(message) {
-        const errorElement = document.getElementById(`${this.id}-error`);
-        if (errorElement) {
-            errorElement.textContent = message || '';
-            errorElement.style.display = message ? 'block' : 'none';
-        } else {
-            console.warn(`Error element not found for ${this.id}`);
-        }
-    }
-
-    mergeStyles(defaultStyles, customStyles) {
-        this.styles = this.constructor.styleKeys.reduce((merged, key) => {
-            merged[key] = { ...defaultStyles[key], ...customStyles[key] };
-            return merged;
-        }, {});
-    }
-
-    generateStylesheet() {
-        return this.constructor.styleKeys.map(key => 
-            this.generateStyleForSelector(this.getSelectorForKey(key), this.styles[key])
         ).join('\n');
     }
 
     getSelectorForKey(key) {
-        // This method should be overridden by subclasses
         return '';
     }
 
@@ -68,7 +67,8 @@ class Element {
             return '';
         }
 
-        const fullSelector = selector ? `#${this.id}-container ${selector}` : `#${this.id}-container`;
+        const baseSelector = `#${this.id}-container`;
+        const fullSelector = selector ? `${baseSelector} ${selector}` : baseSelector;
         const baseStyles = this.rulesToString(rules);
         let styleString = `${fullSelector} { ${baseStyles} }`;
 
@@ -100,26 +100,25 @@ class Element {
         this.initialResponse = value;
     }
 
-    render() {
+    render(surveyElementStyles) {
         const questionContainer = document.getElementById('question-container');
         if (questionContainer) {
-            const elementContainer = document.createElement('div');
-            elementContainer.id = `${this.id}-container`;
-            elementContainer.innerHTML = this.generateHTML();
+            const elementHtml = this.generateHTML();
+            const tempContainer = document.createElement('div');
+            tempContainer.innerHTML = elementHtml;
+            
+            const elementContainer = tempContainer.firstElementChild;
             
             // Apply styles
             const styleElement = document.createElement('style');
-            styleElement.textContent = this.generateStylesheet();
+            styleElement.textContent = this.generateStylesheet(surveyElementStyles);
             elementContainer.prepend(styleElement);
-
+    
             questionContainer.appendChild(elementContainer);
             this.attachEventListeners();
             
             // Set the initial response after rendering
-            if (this.initialResponse !== null) {
-                this.setResponse(this.initialResponse);
-                this.initialResponse = null;
-            }
+            this.data.response = this.initialResponse;
         } else {
             console.error('Question container not found');
         }
@@ -154,25 +153,47 @@ class Element {
         this.showValidationError(null);
     }
 
-    setResponded() {
-        if (this.store_data) {
-            this.data.responded = true;
-        }
-    }
-
     addData(key, value) {
         if (this.store_data) {
             this.data[key] = value;
         }
     }
 
-    isValid() {
-        return this.validate();
+    validate() {
+        let isValid = true;
+        let errorMessage = '';
+
+        // Check if the question is required and answered
+        if (this.required && !this.data.responded) {
+            isValid = false;
+            errorMessage = 'Please provide a response.';
+        }
+
+        // If basic validation passed and custom validation is provided, run it
+        if (isValid && typeof this.customValidation === 'function') {
+            const customValidationResult = this.customValidation(this.data.response);
+            if (customValidationResult !== true) {
+                isValid = false;
+                errorMessage = customValidationResult || 'Invalid input.';
+            }
+        }
+
+        return { isValid, errorMessage };
+    }
+
+    showValidationError(message) {
+        const errorElement = document.getElementById(`${this.id}-error`);
+        if (errorElement) {
+            errorElement.textContent = message || '';
+            errorElement.style.display = message ? 'block' : 'none';
+        } else {
+            console.warn(`Error element not found for ${this.id}`);
+        }
     }
 
     destroy() {
         // Remove all event listeners if they exist
-        if (this.eventListeners){
+        if (this.eventListeners) {
             this.eventListeners.forEach(({ element, eventType, handler }) => {
                 element.removeEventListener(eventType, handler);
             });

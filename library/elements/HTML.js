@@ -1,28 +1,30 @@
 import Element from '../core/element.js';
 
 class HTML extends Element {
-    static styleKeys = ['root']
+    static styleKeys = [...Element.styleKeys];
 
-    static defaultStyles = {
-        root: {
-            background: 'white',
-        }
+    static selectorMap = {
+        ...Element.selectorMap
     };
 
+    static defaultStyles = { };
+
     constructor({ id, content, styles = {} }) {
-        super({ id, type: 'html', store_data: false, required: false });
+        super({ id, type: 'html', store_data: false, required: false, styles });
 
         if (typeof content !== 'string' || content.trim() === '') {
             throw new Error('Content must be a non-empty string');
         }
 
         this.content = content;
-        this.mergeStyles(HTML.defaultStyles, styles);
         this.rendered = false;
+        this.required = false;
+        this.elementStyleKeys = [...HTML.styleKeys];
+        this.selectorMap = { ...HTML.selectorMap };
     }
 
     getSelectorForKey(key) {
-        return key === 'root' ? '' : key;
+        return this.selectorMap[key] || '';
     }
 
     generateHTML() {
@@ -33,7 +35,7 @@ class HTML extends Element {
         `;
     }
 
-    render() {
+    render(surveyElementStyles) {
         if (this.rendered) {
             // If already rendered, update the content instead of recreating
             const container = document.getElementById(`${this.id}-container`);
@@ -44,7 +46,7 @@ class HTML extends Element {
         }
 
         // If not rendered or container not found, render as usual
-        super.render();
+        super.render(surveyElementStyles);
         this.rendered = true;
     }
 
@@ -66,8 +68,11 @@ class HTML extends Element {
     }
 
     validate() {
-        // HTML elements are always valid
-        return true;
+        return {isValid: true, errorMessage: ''};
+    }
+
+    showValidationError() {
+        // Do nothing, HTML elements don't show validation errors
     }
 }
 
