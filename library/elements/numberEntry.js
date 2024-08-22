@@ -1,25 +1,15 @@
 import Element from '../core/element.js';
 
 class NumberEntry extends Element {
-    static styleKeys = ['root', 'innerContainer','label', 'subText', 'input', 'unit', 'errorMessage'];
+    static styleKeys = [...Element.styleKeys, 'input', 'unit'];
+
+    static selectorMap = {
+        ...Element.selectorMap,
+        input: 'input[type="number"]',
+        unit: '.unit-label'
+    };
 
     static defaultStyles = {
-        root: { 
-            marginBottom: '20px',
-        },
-        innerContainer: { },
-        label: { 
-            display: 'block',
-            marginBottom: '5px',
-            fontWeight: 'bold',
-            fontSize: '1.1em',
-        },
-        subText: {
-            display: 'block',
-            marginBottom: '10px',
-            color: '#6c757d',
-            fontSize: '1.1em',
-        },
         input: {
             width: '80px',
             padding: '8px',
@@ -30,43 +20,39 @@ class NumberEntry extends Element {
         unit: {
             marginLeft: '5px',
             fontSize: '0.9em',
-        },
-        errorMessage: {
-            marginTop: '5px',
-            color: '#fa5252',
-            fontSize: '0.9em',
         }
     };
 
-    constructor({ id, text, subText = '', min = null, max = null, step = 1, unit = '', required = true, styles = {} }) {
-        super({ id, type: 'number-entry', store_data: true, required });
+    constructor({
+        id,
+        text,
+        subText = '',
+        min = null,
+        max = null,
+        step = 1,
+        unit = '',
+        required = true,
+        customValidation = null,
+        styles = {}
+    }) {
+        super({ id, type: 'number-entry', store_data: true, required, customValidation, styles });
         this.text = text;
         this.subText = subText;
         this.min = min;
         this.max = max;
         this.step = step;
         this.unit = unit;
-        this.mergeStyles(NumberEntry.defaultStyles, styles);
+
         this.addData('text', text);
         this.addData('subText', subText);
         this.addData('min', min);
         this.addData('max', max);
         this.addData('step', step);
         this.addData('unit', unit);
-        this.setInitialResponse('');
-    }
+        this.initialResponse = '';
 
-    getSelectorForKey(key) {
-        const selectorMap = {
-            root: '',
-            innerContainer: `#${this.id}-inner-container`,
-            label: 'label',
-            subText: '.question-subtext',
-            input: 'input[type="number"]',
-            unit: '.unit-label',
-            errorMessage: '.error-message'
-        };
-        return selectorMap[key] || '';
+        this.elementStyleKeys = [...NumberEntry.styleKeys];
+        this.selectorMap = { ...NumberEntry.selectorMap };
     }
 
     generateHTML() {
@@ -75,9 +61,11 @@ class NumberEntry extends Element {
 
         return `
             <div class="number-entry-question" id="${this.id}-container">
-                <div id="${this.id}-inner-container">
-                    <label for="${this.id}">${this.text}</label>
-                    ${this.subText ? `<span class="question-subtext">${this.subText}</span>` : ''}
+                <div class="inner-container">
+                    <div class="text-container">
+                        <label class="question-text" for="${this.id}">${this.text}</label>
+                        ${this.subText ? `<span class="question-subtext">${this.subText}</span>` : ''}
+                    </div>
                     <div>
                         <input 
                             type="number" 
@@ -98,43 +86,39 @@ class NumberEntry extends Element {
 
     attachEventListeners() {
         const input = document.getElementById(this.id);
-        input.addEventListener('input', (e) => {
+        this.addEventListenerWithTracking(input, 'input', (e) => {
             this.setResponse(e.target.value);
         });
     }
 
     setResponse(value) {
-        super.setResponse(value, value !== '');
+        super.setResponse(value);
         this.addData('numericValue', value !== '' ? parseFloat(value) : null);
+        this.showValidationError(null);
     }
 
-    validate(showError = false) {
+    validate() {
         const value = this.data.response;
-        let isValid = true;
-        let errorMessage = '';
 
-        if (this.required && value === '') {
-            isValid = false;
-            errorMessage = 'This field is required.';
-        } else if (value !== '') {
+        // NumberEntry-specific validation
+        if (value !== '') {
             const numValue = parseFloat(value);
+
             if (isNaN(numValue)) {
-                isValid = false;
-                errorMessage = 'Please enter a valid number.';
-            } else if (this.min !== null && numValue < this.min) {
-                isValid = false;
-                errorMessage = `Please enter a number greater than or equal to ${this.min}.`;
-            } else if (this.max !== null && numValue > this.max) {
-                isValid = false;
-                errorMessage = `Please enter a number less than or equal to ${this.max}.`;
+                return { isValid: false, errorMessage: 'Please enter a valid number.' };
+            }
+
+            if (this.min !== null && numValue < this.min) {
+                return { isValid: false, errorMessage: `Please enter a number greater than or equal to ${this.min}.` };
+            }
+
+            if (this.max !== null && numValue > this.max) {
+                return { isValid: false, errorMessage: `Please enter a number less than or equal to ${this.max}.` };
             }
         }
 
-        if (showError) {
-            this.showValidationError(errorMessage);
-        }
-
-        return isValid;
+        // If NumberEntry-specific validation passes, call parent's validate method
+        return super.validate();
     }
 }
 

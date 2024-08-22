@@ -1,204 +1,223 @@
-import Element from "../core/element.js";
+import Element from '../core/element.js';
 
 class SingleSelect extends Element {
-  static styleKeys = [
-    "questionRoot",
-    "questionInnerContainer",
-    "questionLabel",
-    "questionSubText",
-    "optionsContainer",
-    "option",
-    "radio",
-    "errorMessage",
-  ];
+    static styleKeys = [...Element.styleKeys, 'optionsContainer', 'option', 'radio', 'label', 'otherInput'];
 
-  static defaultStyles = {
-    questionRoot: {
-      marginBottom: "20px",
-      borderRadius: "5px",
-      border: "1px solid #ddd",
-      padding: "10px",
-    },
-    questionInnerContainer: {},
-    questionLabel: {
-      display: "block",
-      marginBottom: "5px",
-      fontWeight: "bold",
-      fontSize: "1.1em",
-    },
-    questionSubText: {
-      display: "block",
-      marginBottom: "10px",
-      color: "#6c757d",
-      fontSize: "1.1em",
-    },
-    optionsContainer: {
-      display: "flex",
-      flexDirection: "column",
-    },
-    option: {
-      marginBottom: "5px",
-    },
-    radio: {
-      marginRight: "5px",
-    },
-    errorMessage: {
-      color: "#fa5252",
-      fontSize: "0.9em",
-      marginTop: "5px",
-    },
-  };
-
-  constructor({
-    id,
-    text,
-    subText = "",
-    options,
-    required = true,
-    randomize = false,
-    styles = {},
-    globalStyles = {},
-  }) {
-    super({ id, type: "single-select", store_data: true, required });
-
-    if (!Array.isArray(options) || options.length === 0) {
-      throw new Error("Options must be a non-empty array");
-    }
-
-    this.text = text;
-    this.subText = subText;
-    this.options = options;
-    this.randomize = Boolean(randomize);
-
-    // Merge global styles with component styles, allowing component styles to override
-    const mergedStyles = this.mergeStyles(
-      SingleSelect.defaultStyles,
-      globalStyles,
-      styles
-    );
-
-    this.styles = mergedStyles;
-
-    this.addData("text", text);
-    this.addData("subText", subText);
-    this.addData("options", options);
-    this.addData("randomize", this.randomize);
-
-    this.setInitialResponse("");
-  }
-
-  mergeStyles(...styles) {
-    return styles.reduce((merged, style) => this.deepMerge(merged, style), {});
-  }
-
-  deepMerge(target, source) {
-    if (!source || typeof source !== "object") return target;
-    if (!target || typeof target !== "object") return source;
-
-    return Object.entries(source).reduce(
-      (merged, [key, value]) => {
-        merged[key] =
-          key.startsWith("&") || key.startsWith("@media")
-            ? this.deepMerge(target[key] || {}, value)
-            : value;
-        return merged;
-      },
-      { ...target }
-    );
-  }
-
-  getSelectorForKey(key) {
-    const selectorMap = {
-      questionRoot: `.single-select-question`,
-      questionInnerContainer: `#${this.id}-inner-container`,
-      questionLabel: ".question-label",
-      questionSubText: ".question-subtext",
-      optionsContainer: ".options-container",
-      option: ".option",
-      radio: 'input[type="radio"]',
-      errorMessage: ".error-message",
+    static selectorMap = {
+        ...Element.selectorMap,
+        optionsContainer: '.options-container',
+        option: '.option',
+        radio: 'input[type="radio"]',
+        label: 'label',
+        otherInput: '.other-input'
     };
-    return selectorMap[key] || "";
-  }
 
-  generateHTML() {
-    let optionsHTML = this.randomize
-      ? this.shuffleArray([...this.options])
-      : this.options;
+    static defaultStyles = {
+        optionsContainer: {
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '10px',
+            lineHeight: '1',
+        },
+        option: {
+            backgroundColor: '#f0f0f0',
+            borderRadius: '8px',
+            padding: '12px 16px',
+            display: 'flex',
+            alignItems: 'center',
+            cursor: 'pointer',
+            '&:hover': {
+                backgroundColor: '#e0e0e0',
+            },
+            '@media (max-width: 650px)': {
+                padding: '12px'
+            }
+        },
+        radio: {
+            appearance: 'none',
+            width: '20px',
+            height: '20px',
+            borderRadius: '50%',
+            border: '1px solid #767676',
+            background: 'white',
+            outline: 'none',
+            margin: 'auto',
+            marginRight: '10px',
+            cursor: 'pointer',
+            verticalAlign: 'middle',
+            '&:checked': {
+                backgroundColor: 'black',
+                boxShadow: 'inset 0 0 0 3px #ffffff'
+            },
+            '@media (max-width: 650px)': {
+                width: '16px',
+                height: '16px'
+            }
+        },
+        label: {
+            cursor: 'pointer',
+            flexGrow: 1
+        },
+        otherInput: {
+            marginTop: '0px',
+            fontSize: '16px',
+            padding: '12px',
+            borderRadius: '8px',
+            border: '1px solid #ccc',
+        }
+    };
 
-    const optionsString = optionsHTML
-      .map(
-        (option, index) => `
-          <div class="option">
-              <input class="question-radio" type="radio" id="${this.id}-${index}" name="${this.id}" value="${option}">
-              <label for="${this.id}-${index}">${option}</label>
-          </div>
-      `
-      )
-      .join("");
+    constructor({
+        id,
+        text,
+        subText = '',
+        options,
+        required = true,
+        randomize = false,
+        allowOther = false,
+        otherText = 'Other (please specify)',
+        styles = {},
+        customValidation = null
+    }) {
+        super({ id, type: 'single-select', store_data: true, required, styles, customValidation });
 
-    return `
-          <div class="single-select-question" id="${this.id}-container">
-              <div id="${
-                this.id
-              }-inner-container" class="question-inner-container">
-                  <label class="question-label" for="${this.id}-0">${
-      this.text
-    }</label>
-                  ${
-                    this.subText
-                      ? `<span class="question-subtext">${this.subText}</span>`
-                      : ""
-                  }
-                  <div class="options-container">
-                      ${optionsString}
-                  </div>
-              </div>
-              <div id="${
-                this.id
-              }-error" class="error-message" style="display: none;"></div>
-          </div>
-      `;
-  }
+        if (!Array.isArray(options) || options.length === 0) {
+            throw new Error('Options must be a non-empty array');
+        }
 
-  shuffleArray(array) {
-    for (let i = array.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [array[i], array[j]] = [array[j], array[i]];
+        this.text = text;
+        this.subText = subText;
+        this.options = options;
+        this.randomize = Boolean(randomize);
+        this.allowOther = Boolean(allowOther);
+        this.otherText = otherText;
+
+        this.addData('text', text);
+        this.addData('subText', subText);
+        this.addData('options', options);
+        this.addData('randomize', this.randomize);
+        this.addData('allowOther', this.allowOther);
+
+        this.initialResponse = '';
+        this.elementStyleKeys = [...SingleSelect.styleKeys];
+        this.selectorMap = { ...SingleSelect.selectorMap };
     }
-    return array;
-  }
 
-  attachEventListeners() {
-    const container = document.getElementById(`${this.id}-container`);
-    this.addEventListenerWithTracking(
-      container,
-      "change",
-      this.handleChange.bind(this)
-    );
-  }
+    generateHTML() {
+        let optionsHTML = this.randomize ? this.shuffleArray([...this.options]) : this.options;
 
-  handleChange(e) {
-    if (e.target.type === "radio") {
-      this.setResponse(e.target.value);
+        const optionsString = optionsHTML.map((option, index) => this.generateOptionHTML(option, index)).join('');
+
+        const otherOptionHTML = this.allowOther ? this.generateOtherOptionHTML() : '';
+
+        return `
+            <div class="single-select-question" id="${this.id}-container">
+                <div class="inner-container">
+                    <div class="text-container">
+                        <label class="question-text">${this.text}</label>
+                        ${this.subText ? `<span class="question-subtext">${this.subText}</span>` : ''}
+                    </div>
+                    <div class="options-container">
+                        ${optionsString}
+                        ${otherOptionHTML}
+                    </div>
+                </div>
+                <div id="${this.id}-error" class="error-message" style="display: none;"></div>
+            </div>
+        `;
     }
-  }
 
-  setResponse(value) {
-    super.setResponse(value, value !== "");
-    this.showValidationError("");
-  }
-
-  validate(showError = false) {
-    const isValid =
-      !this.required || (this.data.response && this.data.response !== "");
-    if (showError && !isValid) {
-      this.showValidationError("Please select an option.");
-    } else {
-      this.showValidationError("");
+    generateOptionHTML(option, index) {
+        return `
+            <div class="option" data-value="${option}">
+                <input type="radio" id="${this.id}-${index}" name="${this.id}" value="${option}">
+                <label for="${this.id}-${index}">${option}</label>
+            </div>
+        `;
     }
-    return isValid;
-  }
+
+    generateOtherOptionHTML() {
+        return `
+            <div class="option" data-value="other">
+                <input type="radio" id="${this.id}-other" name="${this.id}" value="other">
+                <label for="${this.id}-other">${this.otherText}</label>
+            </div>
+            <input type="text" class="other-input" id="${this.id}-other-input" style="display: none;">
+        `;
+    }
+
+    attachEventListeners() {
+        const container = document.getElementById(`${this.id}-container`);
+        this.addEventListenerWithTracking(container, 'click', this.handleClick.bind(this));
+        
+        if (this.allowOther) {
+            const otherInput = document.getElementById(`${this.id}-other-input`);
+            this.addEventListenerWithTracking(otherInput, 'input', this.handleOtherInput.bind(this));
+        }
+    }
+
+    handleClick(e) {
+        const optionDiv = e.target.closest('.option');
+        if (optionDiv) {
+            const radio = optionDiv.querySelector('input[type="radio"]');
+            radio.checked = true;
+            const selectedValue = radio.value;
+
+            if (this.allowOther) {
+                const otherInput = document.getElementById(`${this.id}-other-input`);
+                if (selectedValue === 'other') {
+                    otherInput.style.display = 'block';
+                    this.setResponse({ selected: 'other', otherValue: otherInput.value });
+                } else {
+                    otherInput.style.display = 'none';
+                    otherInput.value = '';
+                    this.setResponse(selectedValue);
+                }
+            } else {
+                this.setResponse(selectedValue);
+            }
+        }
+    }
+
+    handleOtherInput(e) {
+        const otherValue = e.target.value;
+        this.setResponse({ selected: 'other', otherValue: otherValue });
+    }
+
+    setResponse(value) {
+        super.setResponse(value);
+        this.showValidationError(null);
+    }
+
+    validate() {
+        const value = this.data.response;
+
+        if (!value && this.required) {
+            return { isValid: false, errorMessage: 'Please select an option.' };
+        }
+
+        if (this.required && this.allowOther) {
+            if (typeof value === 'object' && value.selected === 'other') {
+                if (!value.otherValue || !value.otherValue.trim()) {
+                    return { isValid: false, errorMessage: 'Please specify the other option.' };
+                }
+            }
+        }
+
+        if (typeof value === 'string' && !this.options.includes(value) && value !== 'other') {
+            return { isValid: false, errorMessage: 'Selected option is not valid.' };
+        }
+
+        return super.validate();
+    }
+
+    shuffleArray(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
+        }
+        return array;
+    }
 }
 
 export default SingleSelect;

@@ -3,7 +3,7 @@ import OpenEnd from '../../library/elements/openEnd.js';
 import HTML from '../../library/elements/HTML.js';
 import MultiSelect from '../../library/elements/multiSelect.js';
 import SingleSelect from '../../library/elements/singleSelect.js';
-import OrderedScale from '../../library/elements/orderedScale.js';
+import NumberScale from '../../library/elements/NumberScale.js';
 import Grid from '../../library/elements/grid.js';
 import NumberEntry from '../../library/elements/numberEntry.js';
 import ProgressBar from '../../library/plugins/progressBar.js';
@@ -29,13 +29,15 @@ async function runSurvey() {
                     backgroundColor: '#5f9ea0',
                 }
             },
-            question: {
-                borderBottom: '1px solid #b0d4ff',
-                paddingBottom: '20px',
-                '@media (max-width: 650px)': {
-                  borderBottom: 'none',
-                  paddingBottom: '0px',
-                },
+            Element: {
+                root:{
+                    borderBottom: '1px solid #b0d4ff',
+                    paddingBottom: '20px',
+                    '@media (max-width: 650px)': {
+                        borderBottom: 'none',
+                        paddingBottom: '0px',
+                    },
+                }
             }
         }
     });
@@ -93,7 +95,7 @@ async function runSurvey() {
             await survey.showPage({ id: `page_${destination}`, elements: [q_destination] });
         }
 
-        const q3 = new OrderedScale({
+        const q3 = new NumberScale({
             id: 'travel_importance',
             text: 'How important are the following factors when choosing a business travel destination?',
             min: 1,

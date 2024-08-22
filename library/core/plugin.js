@@ -1,91 +1,81 @@
 class Plugin {
-    static styleKeys = ['root']; // To be overridden by specific plugins
-
-    static defaultStyles = {
-        root: {}
-    };
-
-    constructor({ styles = {} } = {}) {
-        if (new.target === Plugin) {
-            throw new Error('Plugin is an abstract class and cannot be instantiated directly.');
-        }
-        this.styles = this.mergeStyles(this.constructor.defaultStyles, styles);
-        this.survey = null;
-    }
-
-    mergeStyles(defaultStyles, customStyles) {
-        return this.constructor.styleKeys.reduce((merged, key) => {
-            merged[key] = { ...defaultStyles[key], ...customStyles[key] };
-            return merged;
-        }, {});
-    }
-
-    generateStylesheet() {
-        return this.constructor.styleKeys.map(key => 
-            this.generateStyleForSelector(this.getSelectorForKey(key), this.styles[key])
-        ).join('\n');
-    }
-
-    getSelectorForKey(key) {
-        // To be overridden by specific plugins
-        return '';
-    }
-
-    generateStyleForSelector(selector, rules) {
-        if (!rules || typeof rules !== 'object') {
-            console.warn(`Invalid rules for selector ${selector}`);
-            return '';
-        }
-
-        const baseStyles = this.rulesToString(rules);
-        let styleString = `${selector} { ${baseStyles} }`;
-
-        Object.entries(rules)
-            .filter(([key, value]) => typeof value === 'object')
-            .forEach(([key, value]) => {
-                if (key.startsWith('@media')) {
-                    styleString += `\n${key} { ${selector} { ${this.rulesToString(value)} } }`;
-                } else if (key.startsWith('&')) {
-                    styleString += `\n${selector}${key.slice(1)} { ${this.rulesToString(value)} }`;
-                }
-            });
-
-        return styleString;
-    }
-
-    rulesToString(rules) {
-        return Object.entries(rules)
-            .filter(([key, value]) => typeof value !== 'object')
-            .map(([key, value]) => `${this.camelToKebab(key)}: ${value};`)
-            .join(' ');
-    }
-
-    camelToKebab(string) {
-        return string.replace(/([a-z0-9]|(?=[A-Z]))([A-Z])/g, '$1-$2').toLowerCase();
+    constructor({ targetId = 'survey-container', position = 'top', styles = {} }) {
+        this.targetId = targetId;
+        this.position = position;
+        this.styles = styles;
+        this.pluginId = `plugin-${Math.random().toString(36).substr(2, 9)}`;
     }
 
     initialize(survey) {
-        if (!survey) {
-            throw new Error('A survey instance must be provided to initialize the plugin.');
-        }
         this.survey = survey;
+        this.injectPlugin();
     }
 
-    beforePageRender(page) {
-        // To be implemented by specific plugins
+    injectPlugin() {
+        const targetContainer = document.getElementById(this.targetId);
+        if (!targetContainer) {
+            console.warn(`Target container with id "${this.targetId}" not found`);
+            return;
+        }
+
+        let pluginContainer = this.getOrCreatePluginContainer(targetContainer);
+        
+        const pluginElement = this.createPluginElement();
+        pluginContainer.appendChild(pluginElement);
     }
 
-    afterPageRender(page) {
-        // To be implemented by specific plugins
+    getOrCreatePluginContainer(targetContainer) {
+        const containerId = `${this.targetId}-${this.position}-plugins`;
+        let pluginContainer = document.getElementById(containerId);
+
+        if (!pluginContainer) {
+            pluginContainer = document.createElement('div');
+            pluginContainer.id = containerId;
+            
+            if (this.position === 'top') {
+                targetContainer.insertBefore(pluginContainer, targetContainer.firstChild);
+            } else {
+                targetContainer.appendChild(pluginContainer);
+            }
+        }
+
+        return pluginContainer;
+    }
+
+    createPluginElement() {
+        const element = document.createElement('div');
+        element.id = this.pluginId;
+        element.innerHTML = this.generateContent();
+        this.applyStyles(element);
+        return element;
+    }
+
+    generateContent() {
+        // To be implemented by subclasses
+        throw new Error('generateContent method must be implemented by subclasses');
+    }
+
+    applyStyles(element) {
+        Object.assign(element.style, this.styles.root || {});
+    }
+
+    beforePageRender() {
+        // This method is intentionally left empty
+    }
+
+    afterPageRender() {
+        // This method is intentionally left empty
     }
 
     beforeSurveyFinish() {
-        // To be implemented by specific plugins
+        // This method is intentionally left empty
     }
 
     destroy() {
-        // To be implemented by specific plugins for cleanup
-        this.survey = null;
+        const element = document.getElementById(this.pluginId);
+        if (element) {
+            element.remove();
+        }
     }
 }
 

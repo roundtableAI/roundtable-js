@@ -20,7 +20,7 @@ class ProgressBar extends Plugin {
         bar: {
             width: '0',
             height: '100%',
-            backgroundColor: '#4CAF50',
+            backgroundColor: '#333',
             transition: 'width 0.3s ease-in-out',
         },
         text: {
@@ -36,9 +36,11 @@ class ProgressBar extends Plugin {
         includeProgressText = true,
         includeProgressBar = true,
         progressAsPercentage = true,
+        targetId = 'survey-container',
+        position = 'top',
         styles = {}
     }) {
-        super({ styles });
+        super({ targetId, position, styles: ProgressBar.mergeStyles(ProgressBar.defaultStyles, styles) });
         
         if (typeof maxPages !== 'number' || maxPages <= 0) {
             throw new Error('maxPages must be a positive number');
@@ -51,33 +53,63 @@ class ProgressBar extends Plugin {
         this.progressAsPercentage = Boolean(progressAsPercentage);
     }
 
-    getSelectorForKey(key) {
-        const selectorMap = {
-            root: '#survey-progress',
-            container: '#survey-progress-container',
-            bar: '#survey-progress-bar',
-            text: '#survey-progress-text'
-        };
-        return selectorMap[key] || '';
+    static mergeStyles(defaultStyles, customStyles) {
+        const mergedStyles = { ...defaultStyles };
+        for (const key in customStyles) {
+            if (mergedStyles.hasOwnProperty(key)) {
+                mergedStyles[key] = { ...mergedStyles[key], ...customStyles[key] };
+            }
+        }
+        return mergedStyles;
+    }
+
+    generateContent() {
+        return `
+            <div id="${this.pluginId}-progress">
+                ${this.includeProgressBar ? `<div id="${this.pluginId}-progress-container"><div id="${this.pluginId}-progress-bar"></div></div>` : ''}
+                ${this.includeProgressText ? `<div id="${this.pluginId}-progress-text"></div>` : ''}
+            </div>
+        `;
     }
 
     initialize(survey) {
         super.initialize(survey);
-
-        const surveyContainer = document.getElementById('survey-container');
-        if (!surveyContainer) {
-            throw new Error('Survey container not found');
-        }
-
-        const stylesheet = this.generateStylesheet();
-        surveyContainer.insertAdjacentHTML('afterbegin', `
-            <style>${stylesheet}</style>
-            <div id="survey-progress">
-                ${this.includeProgressBar ? '<div id="survey-progress-container"><div id="survey-progress-bar"></div></div>' : ''}
-                ${this.includeProgressText ? '<div id="survey-progress-text"></div>' : ''}
-            </div>
-        `);
+        this.applyStyles();
         this.updateProgress();
+    }
+
+    applyStyles() {
+        const styleElement = document.createElement('style');
+        styleElement.textContent = this.generateStylesheet();
+        document.head.appendChild(styleElement);
+    }
+
+    generateStylesheet() {
+        return ProgressBar.styleKeys.map(key => 
+            this.generateStyleForSelector(this.getSelectorForKey(key), this.styles[key])
+        ).join('\n');
+    }
+
+    getSelectorForKey(key) {
+        const selectorMap = {
+            root: `#${this.pluginId}-progress`,
+            container: `#${this.pluginId}-progress-container`,
+            bar: `#${this.pluginId}-progress-bar`,
+            text: `#${this.pluginId}-progress-text`
+        };
+        return selectorMap[key] || '';
+    }
+
+    generateStyleForSelector(selector, rules) {
+        if (!rules || typeof rules !== 'object') return '';
+        const styleString = Object.entries(rules)
+            .map(([key, value]) => `${this.camelToKebab(key)}: ${value};`)
+            .join(' ');
+        return `${selector} { ${styleString} }`;
+    }
+
+    camelToKebab(string) {
+        return string.replace(/([a-z0-9]|(?=[A-Z]))([A-Z])/g, '$1-$2').toLowerCase();
     }
 
     beforePageRender() {
@@ -90,10 +122,14 @@ class ProgressBar extends Plugin {
         this.updateProgressText();
     }
 
+    afterPageRender() {
+        // This method is intentionally left empty
+    }
+
     updateProgressBar() {
         if (!this.includeProgressBar) return;
 
-        const progressBar = document.getElementById('survey-progress-bar');
+        const progressBar = document.getElementById(`${this.pluginId}-progress-bar`);
         if (progressBar) {
             const progressPercentage = (this.currentPage / this.maxPages) * 100;
             progressBar.style.width = `${progressPercentage}%`;
@@ -103,19 +139,19 @@ class ProgressBar extends Plugin {
     }
 
     generateProgressText() {
-        if (this.progressAsPercentage){
+        if (this.progressAsPercentage) {
             const percentage = Math.min(Math.round((this.currentPage / this.maxPages) * 100), 100);
             return `${percentage}%`;
         } else {
             const currentPage = Math.min(this.currentPage, this.maxPages + 1);
-            return `Page ${currentPage} of ${this.maxPages}`
+            return `Page ${currentPage} of ${this.maxPages}`;
         }
     }
 
     updateProgressText() {
         if (!this.includeProgressText) return;
 
-        const progressText = document.getElementById('survey-progress-text');
+        const progressText = document.getElementById(`${this.pluginId}-progress-text`);
         if (progressText) {
             const text = this.generateProgressText();
             progressText.textContent = text;
@@ -129,17 +165,11 @@ class ProgressBar extends Plugin {
         this.updateProgress();
     }
 
-    removeProgressBar() {
-        const progressBar = document.getElementById('survey-progress');
+    destroy() {
+        const progressBar = document.getElementById(`${this.pluginId}-progress`);
         if (progressBar) {
             progressBar.remove();
-        } else {
-            console.warn('Progress bar not found for removal');
         }
-    }
-
-    destroy() {
-        this.removeProgressBar();
         super.destroy();
     }
 }

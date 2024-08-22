@@ -1,72 +1,93 @@
 import Element from '../core/element.js';
 
 class Grid extends Element {
-    static styleKeys = ['root', 'innerContainer', 'label', 'subText', 'table', 'headerRow', 'headerCell', 'row', 'rowLabel', 'cell', 'radio', 'errorMessage'];
+    static styleKeys = [...Element.styleKeys, 'table', 'headerRow', 'headerCell', 'rowWrapper', 'row', 'rowLabel', 'cell', 'radio'];
+
+    static selectorMap = {
+        ...Element.selectorMap,
+        table: 'table',
+        headerRow: 'thead tr',
+        headerCell: 'thead th',
+        rowWrapper: '.row-wrapper',
+        row: 'tbody tr',
+        rowLabel: 'tbody td.row-label',
+        cell: 'tbody td',
+        radio: 'input[type="radio"]'
+    };
 
     static defaultStyles = {
-        root: { 
-            marginBottom: '20px',
-            borderRadius: '5px'
-        },
-        innerContainer: { },
-        label: { 
-            display: 'block',
-            marginBottom: '5px',
-            fontWeight: 'bold',
-            fontSize: '1.1em',
-        },
-        subText: {
-            display: 'block',
-            marginBottom: '10px',
-            color: '#6c757d',
-            fontSize: '1.1em',
-        },
         table: {
             width: '100%',
-            borderCollapse: 'collapse'
+            borderCollapse: 'separate',
+            borderSpacing: '0 10px',
+            lineHeight: '1',
+            '@media (max-width: 650px)': {
+                fontSize: '0.9em'
+            }
         },
-        headerRow: {
-            backgroundColor: '#f2f2f2'
-        },
+        headerRow: {},
         headerCell: {
-            padding: '10px',
+            padding: '0px 16px',
             textAlign: 'center',
-            fontWeight: 'bold'
+            fontWeight: 'normal',
+            '@media (max-width: 650px)': {
+                padding: '0px 12px'
+            }
         },
         row: {
-            borderBottom: '1px solid #dee2e6'
+            backgroundColor: '#f0f0f0',
+            borderRadius: '12px',
         },
         rowLabel: {
-            padding: '10px',
-            fontWeight: 'bold',
-            textAlign: 'left'
+            padding: '12px 16px',
+            textAlign: 'left',
+            borderTopLeftRadius: '8px',
+            borderBottomLeftRadius: '8px',
+            '@media (max-width: 650px)': {
+                padding: '12px'
+            }
         },
         cell: {
-            padding: '10px',
-            textAlign: 'center'
+            textAlign: 'center',
+            verticalAlign: 'middle',
         },
         radio: {
-            margin: '0 auto'
-        },
-        errorMessage: {
-            color: '#fa5252',
-            fontSize: '0.9em',
-            marginTop: '5px',
+            appearance: 'none',
+            width: '20px',
+            height: '20px',
+            borderRadius: '50%',
+            border: '1px solid black',
+            border: '1px solid #767676',
+            outline: 'none',
+            margin: '0 auto',
+            background: 'white',
+            cursor: 'pointer',
+            verticalAlign: 'middle',
+            '&:checked': {
+                backgroundColor: 'black',
+                boxShadow: 'inset 0 0 0 3px #ffffff'
+            },
+            '@media (max-width: 650px)': {
+                width: '16px',
+                height: '16px'
+            }
         }
     };
 
-    constructor({ 
-        id, 
-        text, 
-        subText = '', 
-        rows, 
-        columns, 
-        required = true, 
-        randomizeRows = false, 
-        randomizeColumns = false, 
-        styles = {} 
+
+    constructor({
+        id,
+        text,
+        subText = '',
+        rows,
+        columns,
+        required = true,
+        randomizeRows = false,
+        randomizeColumns = false,
+        customValidation = null,
+        styles = {}
     }) {
-        super({ id, type: 'grid', store_data: true, required });
+        super({ id, type: 'grid', store_data: true, required, customValidation, styles });
 
         if (!Array.isArray(rows) || rows.length === 0 || !Array.isArray(columns) || columns.length === 0) {
             throw new Error('Rows and columns must be non-empty arrays');
@@ -79,8 +100,6 @@ class Grid extends Element {
         this.randomizeRows = Boolean(randomizeRows);
         this.randomizeColumns = Boolean(randomizeColumns);
 
-        this.mergeStyles(Grid.defaultStyles, styles);
-
         this.addData('text', text);
         this.addData('subText', subText);
         this.addData('rows', rows);
@@ -88,25 +107,10 @@ class Grid extends Element {
         this.addData('randomizeRows', this.randomizeRows);
         this.addData('randomizeColumns', this.randomizeColumns);
 
-        this.setInitialResponse({});
-    }
+        this.initialResponse = {};
 
-    getSelectorForKey(key) {
-        const selectorMap = {
-            root: '',
-            innerContainer: `#${this.id}-inner-container`,
-            label: '.question-label',
-            subText: '.question-subtext',
-            table: 'table',
-            headerRow: 'thead tr',
-            headerCell: 'thead th',
-            row: 'tbody tr',
-            rowLabel: 'tbody td.row-label',
-            cell: 'tbody td',
-            radio: 'input[type="radio"]',
-            errorMessage: '.error-message'
-        };
-        return selectorMap[key] || '';
+        this.elementStyleKeys = [...Grid.styleKeys];
+        this.selectorMap = { ...Grid.selectorMap };
     }
 
     generateHTML() {
@@ -134,9 +138,11 @@ class Grid extends Element {
 
         return `
             <div class="grid-question" id="${this.id}-container">
-                <div id="${this.id}-inner-container">
-                    <label class="question-label">${this.text}</label>
-                    ${this.subText ? `<span class="question-subtext">${this.subText}</span>` : ''}
+                <div class="inner-container">
+                    <div class="text-container">
+                        <label class="question-text">${this.text}</label>
+                        ${this.subText ? `<span class="question-subtext">${this.subText}</span>` : ''}
+                    </div>
                     <table>
                         <thead>${headerRow}</thead>
                         <tbody>${bodyRows}</tbody>
@@ -145,6 +151,18 @@ class Grid extends Element {
                 <div id="${this.id}-error" class="error-message" style="display: none;"></div>
             </div>
         `;
+    }
+
+    generateStylesheet(surveyElementStyles) {
+        const stylesheet = super.generateStylesheet(surveyElementStyles);
+        
+        // Add styles for the last cell in each row
+        const lastCellStyles = this.generateStyleForSelector(`${this.getSelectorForKey('cell')}:last-child`, {
+            borderTopRightRadius: '8px',
+            borderBottomRightRadius: '8px',
+        });
+
+        return stylesheet + '\n' + lastCellStyles;
     }
 
     shuffleArray(array) {
@@ -174,22 +192,23 @@ class Grid extends Element {
     }
 
     setResponse(value) {
-        const valueHasEntries = Object.values(value).some(val => val !== null);
-        super.setResponse(value, valueHasEntries);
-        this.showValidationError('');
+        super.setResponse(value);
+        this.showValidationError(null);
     }
 
-    validate(showError = false) {
+    validate() {
+        // Grid-specific validation
         const unansweredRows = this.rows.filter(row => !this.data.response[row]);
-        const isValid = !this.required || unansweredRows.length === 0;
-        
-        if (showError && !isValid) {
-            this.showValidationError(`Please provide a response for all rows. Missing: ${unansweredRows.join(', ')}`);
-        } else {
-            this.showValidationError('');
+
+        if (unansweredRows.length > 0) {
+            return {
+                isValid: false,
+                errorMessage: `Please provide a response for all rows. Missing: ${unansweredRows.join(', ')}`
+            };
         }
 
-        return isValid;
+        // If Grid-specific validation passed, call parent's validate method
+        return super.validate();
     }
 }
 
