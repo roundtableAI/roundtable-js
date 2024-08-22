@@ -6,12 +6,13 @@ class Element {
         responseTimestamp: null
     };
 
-    static styleKeys = ['root', 'innerContainer', 'label', 'subText', 'errorMessage'];
+    static styleKeys = ['root', 'innerContainer', 'textContainer', 'text', 'subText', 'errorMessage'];
 
     static selectorMap = {
         root: '',
         innerContainer: '.inner-container',
-        label: '.question-label',
+        textContainer: '.text-container',
+        text: '.question-text',
         subText: '.question-subtext',
         errorMessage: '.error-message'
     };
@@ -58,7 +59,7 @@ class Element {
     }
 
     getSelectorForKey(key) {
-        return '';
+        return this.selectorMap[key] || '';
     }
 
     generateStyleForSelector(selector, rules) {

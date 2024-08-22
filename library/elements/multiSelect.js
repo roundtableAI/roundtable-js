@@ -1,25 +1,57 @@
 import Element from '../core/element.js';
 
 class MultiSelect extends Element {
-    static styleKeys = [...Element.styleKeys, 'optionsContainer', 'option', 'checkbox'];
+    static styleKeys = [...Element.styleKeys, 'optionsContainer', 'option', 'checkbox', 'label'];
 
     static selectorMap = {
         ...Element.selectorMap,
         optionsContainer: '.options-container',
         option: '.option',
-        checkbox: 'input[type="checkbox"]'
+        checkbox: 'input[type="checkbox"]',
+        label: 'label'
     };
 
     static defaultStyles = {
         optionsContainer: {
             display: 'flex',
-            flexDirection: 'column'
+            flexDirection: 'column',
+            gap: '10px',
+            lineHeight: '1',
         },
         option: {
-            marginBottom: '5px'
+            backgroundColor: '#f0f0f0',
+            borderRadius: '8px',
+            padding: '12px 16px',
+            display: 'flex',
+            alignItems: 'center',
+            cursor: 'pointer',
+            '&:hover': {
+                backgroundColor: '#e0e0e0',
+                '@media (max-width: 650px)': {
+                    backgroundColor: '#f0f0f0'
+                }
+            },
+            '@media (max-width: 650px)': {
+                padding: '12px'
+            }
         },
+
         checkbox: {
-            marginRight: '5px'
+            width: '20px',
+            height: '20px',
+            accentColor: 'black',
+            borderColor: 'black',
+            backgroundColor: 'transparent',
+            margin: '0',
+            marginRight: '10px',
+            '@media (max-width: 650px)': {
+                width: '16px',
+                height: '16px'
+            }
+        },
+        label: {
+            cursor: 'pointer',
+            flexGrow: 1
         }
     };
 
@@ -63,15 +95,11 @@ class MultiSelect extends Element {
         this.selectorMap = { ...MultiSelect.selectorMap };
     }
 
-    getSelectorForKey(key) {
-        return this.selectorMap[key] || '';
-    }
-
     generateHTML() {
         let optionsHTML = this.randomize ? this.shuffleArray([...this.options]) : this.options;
 
         const optionsString = optionsHTML.map((option, index) => `
-            <div class="option">
+            <div class="option" data-value="${option}">
                 <input type="checkbox" id="${this.id}-${index}" name="${this.id}" value="${option}">
                 <label for="${this.id}-${index}">${option}</label>
             </div>
@@ -80,8 +108,10 @@ class MultiSelect extends Element {
         return `
             <div class="multi-select-question" id="${this.id}-container">
                 <div class="inner-container">
-                    <label class="question-label">${this.text}</label>
-                    ${this.subText ? `<span class="question-subtext">${this.subText}</span>` : ''}
+                    <div class="text-container">
+                        <label class="question-text">${this.text}</label>
+                        ${this.subText ? `<span class="question-subtext">${this.subText}</span>` : ''}
+                    </div>
                     <div class="options-container">
                         ${optionsString}
                     </div>
@@ -90,22 +120,16 @@ class MultiSelect extends Element {
             </div>
         `;
     }
-
-    shuffleArray(array) {
-        for (let i = array.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
-            [array[i], array[j]] = [array[j], array[i]];
-        }
-        return array;
-    }
-
     attachEventListeners() {
         const container = document.getElementById(`${this.id}-container`);
-        this.addEventListenerWithTracking(container, 'change', this.handleChange.bind(this));
+        this.addEventListenerWithTracking(container, 'click', this.handleClick.bind(this));
     }
 
-    handleChange(e) {
-        if (e.target.type === 'checkbox') {
+    handleClick(e) {
+        const optionDiv = e.target.closest('.option');
+        if (optionDiv) {
+            const checkbox = optionDiv.querySelector('input[type="checkbox"]');
+            checkbox.checked = !checkbox.checked;
             this.updateResponse();
         }
     }
@@ -125,7 +149,6 @@ class MultiSelect extends Element {
     validate() {
         const selectedCount = this.data.response ? this.data.response.length : 0;
 
-        // MultiSelect-specific validation
         if (this.minSelected > 0 && selectedCount < this.minSelected) {
             return { isValid: false, errorMessage: `Please select at least ${this.minSelected} option(s).` };
         }
@@ -134,8 +157,15 @@ class MultiSelect extends Element {
             return { isValid: false, errorMessage: `Please select no more than ${this.maxSelected} option(s).` };
         }
 
-        // If MultiSelect-specific validation passed, call parent's validate method
         return super.validate();
+    }
+
+    shuffleArray(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
+        }
+        return array;
     }
 }
 

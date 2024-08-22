@@ -19,13 +19,18 @@ class CheckBox extends Element {
             background: 'white',
         },
         checkbox: {
-            height: '16px',
-            width: '16px',
+            width: '20px',
+            height: '20px',
+            accentColor: 'black',
+            borderColor: 'black',
+            backgroundColor: 'transparent',
+            marginRight: '5px',
+            '@media (max-width: 650px)': {
+                width: '16px',
+                height: '16px'
+            }
         },
-        checkboxLabel: {
-            fontSize: '1.1em',
-            fontWeight: '600',
-        }
+        checkboxLabel: { }
     };
 
     constructor({
@@ -42,10 +47,6 @@ class CheckBox extends Element {
 
         this.elementStyleKeys = [...CheckBox.styleKeys];
         this.selectorMap = { ...CheckBox.selectorMap };
-    }
-
-    getSelectorForKey(key) {
-        return this.selectorMap[key] || '';
     }
 
     generateHTML() {

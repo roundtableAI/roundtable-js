@@ -55,10 +55,6 @@ class NumberEntry extends Element {
         this.selectorMap = { ...NumberEntry.selectorMap };
     }
 
-    getSelectorForKey(key) {
-        return this.selectorMap[key] || '';
-    }
-
     generateHTML() {
         const minAttr = this.min !== null ? `min="${this.min}"` : '';
         const maxAttr = this.max !== null ? `max="${this.max}"` : '';
@@ -66,8 +62,10 @@ class NumberEntry extends Element {
         return `
             <div class="number-entry-question" id="${this.id}-container">
                 <div class="inner-container">
-                    <label for="${this.id}">${this.text}</label>
-                    ${this.subText ? `<span class="question-subtext">${this.subText}</span>` : ''}
+                    <div class="text-container">
+                        <label class="question-text" for="${this.id}">${this.text}</label>
+                        ${this.subText ? `<span class="question-subtext">${this.subText}</span>` : ''}
+                    </div>
                     <div>
                         <input 
                             type="number" 

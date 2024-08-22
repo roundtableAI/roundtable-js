@@ -20,7 +20,7 @@ class ProgressBar extends Plugin {
         bar: {
             width: '0',
             height: '100%',
-            backgroundColor: '#4CAF50',
+            backgroundColor: '#333',
             transition: 'width 0.3s ease-in-out',
         },
         text: {

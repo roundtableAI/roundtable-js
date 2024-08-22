@@ -19,6 +19,10 @@ class OpenEnd extends Element {
             fontSize: '1em',
             marginBottom: '0px',
             display: 'block',
+            '&:focus': {
+                borderColor: 'black',
+                outline: 'none',
+            },
         }
     };
 
@@ -66,16 +70,14 @@ class OpenEnd extends Element {
         this.selectorMap = { ...OpenEnd.selectorMap };
     }
 
-    getSelectorForKey(key) {
-        return this.selectorMap[key] || '';
-    }
-
     generateHTML() {
         return `
             <div class="open-end-question" id="${this.id}-container">
                 <div class="inner-container">
-                    <label for="${this.id}">${this.text}</label>
-                    ${this.subText ? `<span class="question-subtext">${this.subText}</span>` : ''}
+                    <div class="text-container">
+                        <label class="question-text" for="${this.id}">${this.text}</label>
+                        ${this.subText ? `<span class="question-subtext">${this.subText}</span>` : ''}
+                    </div>
                     <textarea 
                         id="${this.id}" 
                         name="${this.id}" 

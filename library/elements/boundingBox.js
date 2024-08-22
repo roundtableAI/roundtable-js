@@ -51,6 +51,7 @@ class BoundingBox extends Element {
     constructor({
         id,
         text,
+        subText = '',
         imageUrl,
         boxColor = '#FF0000',
         boxOpacity = 0.3,
@@ -66,10 +67,18 @@ class BoundingBox extends Element {
         }
 
         this.text = text;
+        this.subText = subText;
         this.imageUrl = imageUrl;
         this.boxColor = boxColor;
         this.boxOpacity = boxOpacity;
         this.maxBoxes = maxBoxes;
+
+        this.addData('text', text);
+        this.addData('subText', subText);
+        this.addData('imageUrl', imageUrl);
+        this.addData('boxColor', boxColor);
+        this.addData('boxOpacity', boxOpacity);
+        this.addData('maxBoxes', maxBoxes);
 
         this.initializeState();
         this.bindEventHandlers();
@@ -79,15 +88,14 @@ class BoundingBox extends Element {
         this.selectorMap = { ...BoundingBox.selectorMap };
     }
 
-    getSelectorForKey(key) {
-        return this.selectorMap[key] || '';
-    }
-
     generateHTML() {
         return `
             <div class="bounding-box-question" id="${this.id}-container">
                 <div class="inner-container">
-                    <label class="question-label">${this.text}</label>
+                    <div class="text-container">
+                        <label class="question-text">${this.text}</label>
+                        ${this.subText ? `<span class="question-subtext">${this.subText}</span>` : ''}
+                    </div>
                     <canvas id="${this.id}-canvas"></canvas>
                     <div>
                         <button id="${this.id}-clear" class="bounding-box-button">Clear</button>

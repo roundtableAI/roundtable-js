@@ -18,6 +18,11 @@ class TextInput extends Element {
             fontSize: '1em',
             marginBottom: '0px',
             display: 'block',
+            // Focus
+            '&:focus': {
+                borderColor: 'black',
+                outline: 'none',
+            },
         }
     };
 
@@ -54,16 +59,14 @@ class TextInput extends Element {
         this.selectorMap = { ...TextInput.selectorMap };
     }
 
-    getSelectorForKey(key) {
-        return this.selectorMap[key] || '';
-    }
-
     generateHTML() {
         return `
             <div class="text-input-question" id="${this.id}-container">
                 <div class="inner-container">
-                    <label for="${this.id}">${this.text}</label>
-                    ${this.subText ? `<span class="question-subtext">${this.subText}</span>` : ''}
+                    <div class="text-container">
+                        <label class="question-text" for="${this.id}">${this.text}</label>
+                        ${this.subText ? `<span class="question-subtext">${this.subText}</span>` : ''}
+                    </div>
                     <input 
                         type="text"
                         id="${this.id}" 

@@ -1,12 +1,11 @@
 class Survey {
-    static styleKeys = ['body', 'container', 'question', 'navigation', 'button', 'errorMessage', 'nextButtonError', 'finishMessage'];
-    static elementStyleKeys = ['root', 'innerContainer', 'label', 'subText', 'errorMessage'];
+    static styleKeys = ['body', 'container', 'navigation', 'button', 'errorMessage', 'nextButtonError', 'finishMessage'];
 
     static defaultStyles = {
         body: {
-            fontFamily: 'Arial, sans-serif',
+            fontFamily: 'Helvetica, Arial, sans-serif',
             lineHeight: '1.4',
-            color: '#333',
+            color: 'black',
             backgroundColor: '#f7f7f7',
             padding: '25px',
             '@media (max-width: 650px)': {
@@ -16,7 +15,7 @@ class Survey {
         },
         container: {
             width: '100%',
-            maxWidth: '700px',
+            maxWidth: '680px',
             boxSizing: 'border-box',
             margin: '0 auto',
             padding: '25px',
@@ -28,9 +27,6 @@ class Survey {
                 padding: '20px',
             },
         },
-        question: {
-            marginBottom: '30px',
-        },
         navigation: {
             marginTop: '45px',
         },
@@ -41,7 +37,7 @@ class Survey {
             padding: '12px 34px',
             border: 'none',
             fontSize: '1em',
-            borderRadius: '5px',
+            borderRadius: '8px',
             cursor: 'pointer',
             '&:hover': {
                 backgroundColor: '#444',
@@ -49,13 +45,11 @@ class Survey {
         },
         errorMessage: {
             color: '#fa5252',
-            fontWeight: '500',
             marginTop: '5px',
             fontSize: '0.9em',
         },
         nextButtonError: {
             color: '#fa5252',
-            fontWeight: '500',
             marginLeft: '10px',
             display: 'inline-block',
             fontSize: '0.9em',
@@ -69,23 +63,21 @@ class Survey {
 
     static defaultElementStyles = {
         root: { 
-            marginBottom: '20px',
-            borderRadius: '5px'
+            marginBottom: '40px',
         },
         innerContainer: {
             marginTop: '5px',
         },
-        label: { 
+        textContainer: {
+            marginBottom: '10px',
+        },
+        text: { 
             display: 'block',
-            fontWeight: '600',
-            fontSize: '1.1em',
-            marginBottom: '5px',
         },
         subText: {
             display: 'block',
-            marginBottom: '10px',
-            color: '#6c757d',
-            fontSize: '1.1em',
+            color: '#888',
+            fontSize: '1em',
         },
         errorMessage: {
             color: '#fa5252',
@@ -127,17 +119,39 @@ class Survey {
     }
 
     mergeStyles(defaultStyles, customStyles) {
-        const mergedStyles = { ...defaultStyles };
-        
-        for (const [key, value] of Object.entries(customStyles)) {
-            if (typeof value === 'object' && value !== null && !Array.isArray(value)) {
-                mergedStyles[key] = this.mergeStyles(mergedStyles[key] || {}, value);
+        const keys = Object.keys(defaultStyles);
+        return Object.fromEntries(
+            keys.map(key => [key, this.deepMerge(defaultStyles[key], customStyles[key])])
+        );
+    }
+
+    deepMerge(target, source) {
+        if (!source || typeof source !== 'object') return target;
+        if (!target || typeof target !== 'object') return source;
+    
+        const merged = { ...target };
+    
+        Object.entries(source).forEach(([key, value]) => {
+            if (key.startsWith('&') || key.startsWith('@media')) {
+                if(target[key]){
+                    Object.entries(target[key]).forEach(([k,v]) => {
+                        if(k in source) target[key][k] = source[k];
+                    })
+                }
+                merged[key] = this.deepMerge(target[key] || {}, value);
             } else {
-                mergedStyles[key] = value;
+                merged[key] = value;
+                Object.entries(merged).forEach(([k, v]) => {
+                    if (k.startsWith('&') || k.startsWith('@media')) {
+                        merged[k] = {
+                            ...v,
+                            [key]: value,
+                        };
+                    }
+                });
             }
-        }
-        
-        return mergedStyles;
+        });
+        return merged;
     }
 
     applyGlobalStyles() {
@@ -156,7 +170,6 @@ class Survey {
         const selectorMap = {
             body: 'body',
             container: '#survey-container',
-            question: '#question-container > div',
             button: '#next-button',
             errorMessage: '.error-message',
             nextButtonError: '#next-button-error',
@@ -316,7 +329,6 @@ class Survey {
                         nextButtonError.textContent = '';
                         resolve();
                     } else {
-                        console.log('here...')
                         nextButtonError.style.display = 'inline-block';
                         nextButtonError.textContent = 'Please check your answers.';
                     }

@@ -1,13 +1,14 @@
 import Element from '../core/element.js';
 
 class Grid extends Element {
-    static styleKeys = [...Element.styleKeys, 'table', 'headerRow', 'headerCell', 'row', 'rowLabel', 'cell', 'radio'];
+    static styleKeys = [...Element.styleKeys, 'table', 'headerRow', 'headerCell', 'rowWrapper', 'row', 'rowLabel', 'cell', 'radio'];
 
     static selectorMap = {
         ...Element.selectorMap,
         table: 'table',
         headerRow: 'thead tr',
         headerCell: 'thead th',
+        rowWrapper: '.row-wrapper',
         row: 'tbody tr',
         rowLabel: 'tbody td.row-label',
         cell: 'tbody td',
@@ -17,32 +18,62 @@ class Grid extends Element {
     static defaultStyles = {
         table: {
             width: '100%',
-            borderCollapse: 'collapse'
+            borderCollapse: 'separate',
+            borderSpacing: '0 10px',
+            lineHeight: '1',
+            '@media (max-width: 650px)': {
+                fontSize: '0.9em'
+            }
         },
-        headerRow: {
-            backgroundColor: '#f2f2f2'
-        },
+        headerRow: {},
         headerCell: {
-            padding: '10px',
+            padding: '0px 16px',
             textAlign: 'center',
-            fontWeight: 'bold'
+            fontWeight: 'normal',
+            '@media (max-width: 650px)': {
+                padding: '0px 12px'
+            }
         },
         row: {
-            borderBottom: '1px solid #dee2e6'
+            backgroundColor: '#f0f0f0',
+            borderRadius: '12px',
         },
         rowLabel: {
-            padding: '10px',
-            fontWeight: 'bold',
-            textAlign: 'left'
+            padding: '12px 16px',
+            textAlign: 'left',
+            borderTopLeftRadius: '8px',
+            borderBottomLeftRadius: '8px',
+            '@media (max-width: 650px)': {
+                padding: '12px'
+            }
         },
         cell: {
-            padding: '10px',
-            textAlign: 'center'
+            textAlign: 'center',
+            verticalAlign: 'middle',
         },
         radio: {
-            margin: '0 auto'
+            appearance: 'none',
+            width: '20px',
+            height: '20px',
+            borderRadius: '50%',
+            border: '1px solid black',
+            border: '1px solid #767676',
+            outline: 'none',
+            margin: '0 auto',
+            background: 'white',
+            cursor: 'pointer',
+            verticalAlign: 'middle',
+            '&:checked': {
+                backgroundColor: 'black',
+                boxShadow: 'inset 0 0 0 3px #ffffff'
+            },
+            '@media (max-width: 650px)': {
+                width: '16px',
+                height: '16px'
+            }
         }
     };
+
 
     constructor({
         id,
@@ -82,10 +113,6 @@ class Grid extends Element {
         this.selectorMap = { ...Grid.selectorMap };
     }
 
-    getSelectorForKey(key) {
-        return this.selectorMap[key] || '';
-    }
-
     generateHTML() {
         const rowsHTML = this.randomizeRows ? this.shuffleArray([...this.rows]) : this.rows;
         const columnsHTML = this.randomizeColumns ? this.shuffleArray([...this.columns]) : this.columns;
@@ -112,8 +139,10 @@ class Grid extends Element {
         return `
             <div class="grid-question" id="${this.id}-container">
                 <div class="inner-container">
-                    <label class="question-label">${this.text}</label>
-                    ${this.subText ? `<span class="question-subtext">${this.subText}</span>` : ''}
+                    <div class="text-container">
+                        <label class="question-text">${this.text}</label>
+                        ${this.subText ? `<span class="question-subtext">${this.subText}</span>` : ''}
+                    </div>
                     <table>
                         <thead>${headerRow}</thead>
                         <tbody>${bodyRows}</tbody>
@@ -122,6 +151,18 @@ class Grid extends Element {
                 <div id="${this.id}-error" class="error-message" style="display: none;"></div>
             </div>
         `;
+    }
+
+    generateStylesheet(surveyElementStyles) {
+        const stylesheet = super.generateStylesheet(surveyElementStyles);
+        
+        // Add styles for the last cell in each row
+        const lastCellStyles = this.generateStyleForSelector(`${this.getSelectorForKey('cell')}:last-child`, {
+            borderTopRightRadius: '8px',
+            borderBottomRightRadius: '8px',
+        });
+
+        return stylesheet + '\n' + lastCellStyles;
     }
 
     shuffleArray(array) {
