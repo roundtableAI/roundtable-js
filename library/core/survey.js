@@ -155,19 +155,32 @@ class Survey {
     }
   
     deepMerge(target, source) {
-      if (!source || typeof source !== "object") return target;
-      if (!target || typeof target !== "object") return source;
-  
-      return Object.entries(source).reduce(
-        (merged, [key, value]) => {
-          merged[key] =
-            key.startsWith("&") || key.startsWith("@media")
-              ? this.deepMerge(target[key] || {}, value)
-              : value;
-          return merged;
-        },
-        { ...target }
-      );
+        if (!source || typeof source !== 'object') return target;
+        if (!target || typeof target !== 'object') return source;
+    
+        const merged = { ...target };
+    
+        Object.entries(source).forEach(([key, value]) => {
+            if (key.startsWith('&') || key.startsWith('@media')) {
+                if(target[key]){
+                    Object.entries(target[key]).forEach(([k,v]) => {
+                        if(k in source) target[key][k] = source[k];
+                    })
+                }
+                merged[key] = this.deepMerge(target[key] || {}, value);
+            } else {
+                merged[key] = value;
+                Object.entries(merged).forEach(([k, v]) => {
+                    if (k.startsWith('&') || k.startsWith('@media')) {
+                        merged[k] = {
+                            ...v,
+                            [key]: value,
+                        };
+                    }
+                });
+            }
+        });
+        return merged;
     }
   
     generateStylesheet() {
