@@ -10,7 +10,7 @@ import NumberScale from '../../library/elements/numberScale.js';
 import OpenEnd from '../../library/elements/openEnd.js';
 import SingleSelect from '../../library/elements/singleSelect.js';
 import ProgressBar from '../../library/plugins/progressBar.js';
-import pageHTML from '../../library/plugins/pageHTML.js';
+import PageHTML from '../../library/plugins/pageHTML.js';
 
 async function runComprehensiveSurvey() {
     const survey = new Survey({
@@ -111,7 +111,7 @@ async function runComprehensiveSurvey() {
 
     const progress = new ProgressBar({ maxPages: 3 });
 
-    const logo = new pageHTML({
+    const logo = new PageHTML({
         id: 'logo',
         content: '<img src="https://roundtable.ai/images/logo-with-text.svg" alt="Company Logo">',
         position: 'top',
