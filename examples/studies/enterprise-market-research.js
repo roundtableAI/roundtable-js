@@ -3,7 +3,7 @@ import OpenEnd from '../../library/elements/openEnd.js';
 import HTML from '../../library/elements/HTML.js';
 import MultiSelect from '../../library/elements/multiSelect.js';
 import SingleSelect from '../../library/elements/singleSelect.js';
-import NumberScale from '../../library/elements/NumberScale.js';
+import NumberScale from '../../library/elements/numberScale.js';
 import Grid from '../../library/elements/grid.js';
 import NumberEntry from '../../library/elements/numberEntry.js';
 import ProgressBar from '../../library/plugins/progressBar.js';
