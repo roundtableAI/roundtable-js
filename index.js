@@ -7,11 +7,11 @@ import Grid from './library/elements/grid.js';
 import HTML from './library/elements/HTML.js';
 import MultiSelect from './library/elements/multiSelect.js';
 import NumberEntry from './library/elements/numberEntry.js';
-import OrderedScale from './library/elements/orderedScale.js';
 import OpenEnd from './library/elements/openEnd.js';
 import SingleSelect from './library/elements/singleSelect.js';
 import TextInput from './library/elements/textInput.js';
 import ProgressBar from './library/plugins/progressBar.js';
+import PageHTML from './library/plugins/pageHTML.js';
 
 export {
     Survey,
@@ -21,9 +21,9 @@ export {
     HTML,
     MultiSelect,
     NumberEntry,
-    OrderedScale,
     OpenEnd,
     SingleSelect,
+    PageHTML,
     ProgressBar,
     TextInput
 };
