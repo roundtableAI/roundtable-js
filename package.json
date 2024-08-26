@@ -1,6 +1,6 @@
 {
   "name": "roundtable-js",
-  "version": "0.1.2",
+  "version": "0.2.2",
   "type": "module",
   "description": "A modular survey framework built with JavaScript",
   "main": "dist/bundle.js",
