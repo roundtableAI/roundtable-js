@@ -83,7 +83,7 @@ Here are some example surveys built with RoundtableJS. All code is in the [examp
 1. Include the following script tag in your HTML:
 
    ```html
-   <script src="https://cdn.jsdelivr.net/npm/roundtable-js@0.2.1/dist/bundle.js"></script>
+   <script src="https://cdn.jsdelivr.net/npm/roundtable-js@0.2.2/dist/bundle.js"></script>
    ```
 
 ## Usage
