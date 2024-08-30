@@ -1,6 +1,7 @@
 import Survey from '../../library/core/survey.js';
 import BoundingBox from '../../library/elements/boundingBox.js';
 import CheckBox from '../../library/elements/checkBox.js';
+import TextInput from '../../library/elements/textInput.js';
 import DropdownSelect from '../../library/elements/dropdownSelect.js';
 import Grid from '../../library/elements/grid.js';
 import HTML from '../../library/elements/HTML.js';
@@ -12,10 +13,10 @@ import SingleSelect from '../../library/elements/singleSelect.js';
 import ProgressBar from '../../library/plugins/progressBar.js';
 import PageHTML from '../../library/plugins/pageHTML.js';
 
-async function runComprehensiveSurvey() {
+async function runSurvey() {
     const survey = new Survey({
         title: "Comprehensive Survey Example",
-        description: "This survey demonstrates all available question types.",
+        description: "This survey demonstrates all question types and plugins.",
         styles: {
             body: {
                 background: '#f9f9f7',
@@ -32,6 +33,14 @@ async function runComprehensiveSurvey() {
             }
         }
     });
+
+  
+    const textInput = new TextInput({
+        id: 'name',
+        text: 'Name',
+        required: true,
+        placeholder: 'Your name',
+    })
 
     const singleSelect = new SingleSelect({
         id: 'favorite-color',
@@ -57,6 +66,7 @@ async function runComprehensiveSurvey() {
         options: ['United States', 'Canada', 'United Kingdom', 'Australia', 'Germany', 'France', 'Japan', 'Other'],
         required: true
     });
+
 
     const checkBox = new CheckBox({
         id: 'terms',
@@ -105,7 +115,7 @@ async function runComprehensiveSurvey() {
     });
 
     // Group questions into pages
-    const page1 = { id: 'page1', elements: [htmlIntro, singleSelect, multiSelect, dropdownSelect] };
+    const page1 = { id: 'page1', elements: [htmlIntro, textInput, singleSelect, multiSelect, dropdownSelect] };
     const page2 = { id: 'page2', elements: [checkBox, numberEntry, numberScale, openEnd] };
     const page3 = { id: 'page3', elements: [grid, boundingBox] };
 
@@ -144,4 +154,4 @@ async function runComprehensiveSurvey() {
 }
 
 // Run the survey
-runComprehensiveSurvey();
+runSurvey();
