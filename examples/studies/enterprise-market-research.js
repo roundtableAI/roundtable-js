@@ -1,11 +1,10 @@
 import Survey from '../../library/core/survey.js';
-import OpenEnd from '../../library/elements/openEnd.js';
+import Grid from '../../library/elements/grid.js';
 import HTML from '../../library/elements/HTML.js';
 import MultiSelect from '../../library/elements/multiSelect.js';
-import SingleSelect from '../../library/elements/singleSelect.js';
-import NumberScale from '../../library/elements/numberScale.js';
-import Grid from '../../library/elements/grid.js';
 import NumberEntry from '../../library/elements/numberEntry.js';
+import OpenEnd from '../../library/elements/openEnd.js';
+import SingleSelect from '../../library/elements/singleSelect.js';
 import ProgressBar from '../../library/plugins/progressBar.js';
 
 async function runSurvey() {
@@ -15,12 +14,14 @@ async function runSurvey() {
         styles: {
             body: {
                 background: '#f0f8ff',
+                '@media (max-width: 650px)': {
+                  background: 'white',
+                },
             },
             container: {
-                border: '1px solid #b0d4ff',
                 boxShadow: '0 0 10px rgba(0,0,255,0.1)',
                 '@media (max-width: 650px)': {
-                  border: 'none',
+                  boxShadow: 'none',
                 },
             },
             button: {
@@ -29,15 +30,13 @@ async function runSurvey() {
                     backgroundColor: '#5f9ea0',
                 }
             },
-            Element: {
-                root:{
-                    borderBottom: '1px solid #b0d4ff',
-                    paddingBottom: '20px',
-                    '@media (max-width: 650px)': {
-                        borderBottom: 'none',
-                        paddingBottom: '0px',
-                    },
-                }
+            question: {
+                borderBottom: '1px solid #b0d4ff',
+                paddingBottom: '20px',
+                '@media (max-width: 650px)': {
+                  borderBottom: 'none',
+                  paddingBottom: '0px',
+                },
             }
         }
     });
@@ -95,18 +94,7 @@ async function runSurvey() {
             await survey.showPage({ id: `page_${destination}`, elements: [q_destination] });
         }
 
-        const q3 = new NumberScale({
-            id: 'travel_importance',
-            text: 'How important are the following factors when choosing a business travel destination?',
-            min: 1,
-            max: 5,
-            labels: ['Not important', '', 'Neutral', '', 'Very important'],
-            required: true
-        });
-
-        await survey.showPage({ id: 'page3', elements: [q3] });
-
-        const q4 = new Grid({
+        const q3 = new Grid({
             id: 'travel_satisfaction',
             text: 'Please rate your satisfaction with the following aspects of your most recent business trip:',
             rows: ['Flight', 'Hotel', 'Transportation', 'Food', 'Meeting facilities'],
@@ -114,27 +102,25 @@ async function runSurvey() {
             required: true
         });
 
-        await survey.showPage({ id: 'page4', elements: [q4] });
+        await survey.showPage({ id: 'page4', elements: [q3] });
 
-        const q5 = new NumberEntry({
+        const q4 = new NumberEntry({
             id: 'travel_budget',
             text: 'What is your average budget per business trip (in USD)?',
-            min: 100,
-            max: 10000,
+            min: 0,
+            max: 1000000,
             required: true
         });
 
-        await survey.showPage({ id: 'page5', elements: [q5] });
+        await survey.showPage({ id: 'page5', elements: [q4] });
 
-        const q6 = new OpenEnd({
+        const q5 = new OpenEnd({
             id: 'travel_improvement',
             text: 'What one thing would most improve your business travel experience?',
-            minLength: 10,
-            maxLength: 200,
             required: true
         });
 
-        await survey.showPage({ id: 'page6', elements: [q6] });
+        await survey.showPage({ id: 'page6', elements: [q5] });
     }
 
     survey.finishSurvey(`

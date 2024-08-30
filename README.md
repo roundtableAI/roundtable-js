@@ -47,11 +47,15 @@ RoundtableJS is an open-source JavaScript library for building complex surveys, 
 
 Here are some example surveys built with RoundtableJS. All code is in the [examples/studies](examples/studies) directory.
 
-- [Customer Feedback Survey](https://roundtable.ai/survey/bb1f6ebf6e9c99c938df3fa74e9943d5356bb2a1)
-- [Product Market Fit Survey](https://roundtable.ai/survey/0752ffcf82a327b05abe4484f1e6f8e65a200355)
-- [Book a Demo Form](https://roundtable.ai/survey/1f67699733d860e486f508f593edfcb4ba4f9159)
-- [Enterprise Market Research Survey](https://roundtable.ai/survey/9593255a3aa7231051e75e578747eaea2fde17b3)
-- [Data Annotation Task](https://roundtable.ai/survey/c09e45719a21e7a23565097b60d48532c8e384e9)
+- [Element showcase](https://roundtable.ai/survey/3e76ab92512f398e366baffd772b06cf972c0c0e)
+- [Enterprise market research survey](https://roundtable.ai/survey/3020c264e57a0415889a7d82330af66daf30db15)
+- [Simple NPS with branding](https://roundtable.ai/survey/bed16082755fc02b70f582c1fe143b8e7d292a43)
+- [Typeform survey](https://roundtable.ai/survey/134a2317bb595d7768194de65772f97dc760b60b)
+- [Product market fit survey](https://roundtable.ai/survey/765c87578ccf7e24522e91c44cf41f845c4bcd0e)
+- [Book a demo form](https://roundtable.ai/survey/374fd1f3f1719d69b21438cbacd7013d28b7daeb)
+- [Data annotation task](https://roundtable.ai/survey/1518e8ae74e9075349b07ffeee8ee21166477e4d)
+- [RLHF data collection](https://roundtable.ai/survey/89eeb07064400b58f2d3a3d979b0cff729f1ee2b)
+
 
 ## 🚀 Quick Start
 
@@ -93,7 +97,7 @@ Here are some example surveys built with RoundtableJS. All code is in the [examp
 
    ```javascript
    import Survey from 'roundtable-js/core/survey.js';
-   import SingleSelect from 'roundtable-js/question_types/singleSelect.js';
+   import SingleSelect from 'roundtable-js/elements/singleSelect.js';
    ```
 
    For CDN installation, ensure the script is loaded and use the global `RoundtableJS` object:
