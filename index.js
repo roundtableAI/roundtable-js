@@ -3,6 +3,7 @@
 import Survey from './library/core/survey.js';
 import BoundingBox from './library/elements/boundingBox.js';
 import CheckBox from './library/elements/checkBox.js';
+import DropdownSelect from './library/elements/dropdownSelect.js';
 import Grid from './library/elements/grid.js';
 import HTML from './library/elements/HTML.js';
 import MultiSelect from './library/elements/multiSelect.js';
@@ -18,6 +19,7 @@ export {
     Survey,
     BoundingBox,
     CheckBox,
+    DropdownSelect,
     Grid,
     HTML,
     MultiSelect,
